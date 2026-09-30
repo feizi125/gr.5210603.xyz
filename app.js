@@ -14,7 +14,7 @@
   /* ---------------- 多语言（中 / EN / ไทย） ---------------- */
   var I18N = {
     zh: {
-      docTitle: '澜联 LANLINK · 个人联系方式', langTitle: '切换语言',
+      docTitle: '追风的牧者 · 个人联系方式', langTitle: '切换语言',
       btnVcf: '保存联系人', btnShare: '二维码', adminTitle: '管理登录',
       qrHint: '扫码添加联系人', countFmt: '联系方式 · {n} 条',
       loginTitle: '管理员登录', pwdLabel: '访问密码', pwdPh: '请输入管理密码',
@@ -34,7 +34,7 @@
       tExported: '已导出 data.json，提交到仓库即可全局生效', tDataBig: '数据过大，图片请压缩后再上传'
     },
     en: {
-      docTitle: 'LANLINK · My Contact Card', langTitle: 'Switch language',
+      docTitle: 'Wind Chasing Shepherd · Contact Card', langTitle: 'Switch language',
       btnVcf: 'Save Contact', btnShare: 'QR Code', adminTitle: 'Admin login',
       qrHint: 'Scan to add contact', countFmt: 'Contacts · {n}',
       loginTitle: 'Admin Login', pwdLabel: 'Password', pwdPh: 'Enter admin password',
@@ -54,7 +54,7 @@
       tExported: 'Exported data.json — commit it to the repo to publish', tDataBig: 'Data too large, please compress images'
     },
     th: {
-      docTitle: 'LANLINK · ข้อมูลติดต่อส่วนตัว', langTitle: 'เปลี่ยนภาษา',
+      docTitle: 'ผู้เลี้ยงผู้ไล่ตามลม · ข้อมูลติดต่อ', langTitle: 'เปลี่ยนภาษา',
       btnVcf: 'บันทึกผู้ติดต่อ', btnShare: 'คิวอาร์โค้ด', adminTitle: 'เข้าสู่ระบบผู้ดูแล',
       qrHint: 'สแกนเพื่อเพิ่มผู้ติดต่อ', countFmt: 'ผู้ติดต่อ · {n} รายการ',
       loginTitle: 'เข้าสู่ระบบผู้ดูแล', pwdLabel: 'รหัสผ่าน', pwdPh: 'กรอกรหัสผ่านผู้ดูแล',
