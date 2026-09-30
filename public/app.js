@@ -681,6 +681,13 @@
       applyLang();
       var savedPass = sessionStorage.getItem(SESSION_KEY);
       if (savedPass) { state.pass = savedPass; setAdmin(true); }
+      if (adminEntry()) {
+        $('btnAdmin').hidden = false;
+        if (!state.isAdmin) {
+          showModal('loginModal');
+          setTimeout(function () { $('pwdInput').focus(); }, 60);
+        }
+      }
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
