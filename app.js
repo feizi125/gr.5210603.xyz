@@ -9,6 +9,85 @@
   var ADMIN_PASS = 'feizi521';
   var STORE_KEY = 'lanlink-data';
   var SESSION_KEY = 'lanlink-admin';
+  var LANG_STORE = 'lanlink-lang';
+
+  /* ---------------- 多语言（中 / EN / ไทย） ---------------- */
+  var I18N = {
+    zh: {
+      docTitle: '澜联 LANLINK · 个人联系方式', langTitle: '切换语言',
+      btnVcf: '保存联系人', btnShare: '二维码', adminTitle: '管理登录',
+      qrHint: '扫码添加联系人', countFmt: '联系方式 · {n} 条',
+      loginTitle: '管理员登录', pwdLabel: '访问密码', pwdPh: '请输入管理密码',
+      pwdErr: '密码不正确，请重试', btnLogin: '进入编辑模式',
+      qrSave: '下载 PNG', editTitle: '编辑资料', btnExport: '导出 data.json', btnLogout: '退出登录',
+      uploadAvatar: '上传头像', removeAvatar: '移除头像',
+      fName: '姓名', fTitleLb: '职位 / 头衔', fOrg: '公司 / 团队',
+      fTags: '个性标签', tagsTip: '（用逗号分隔）', tagsPh: '例如：远程协作, 周末咖啡, 快速回复',
+      contactItems: '联系方式条目', btnAddContact: '+ 添加', cancel: '取消', savePublish: '保存并发布',
+      eLabel: '名称', eValue: '内容', eRemove: '删除条目',
+      eUploadQr: '上传二维码图（可选，如微信二维码截图）', eChangeQr: '更换二维码图', eClearQr: '移除图片', eHidden: '隐藏',
+      types: { phone: '电话', email: '邮箱', wechat: '微信', qq: 'QQ', link: '网址', github: 'GitHub', address: '地址', other: '其他' },
+      tCopied: '已复制：', tCopyFail: '复制失败，请手动复制', tSaved: '已保存并发布',
+      tNeedOne: '至少保留一条联系方式', tImgBig: '图片请小于 1.5MB', tLogout: '已退出编辑模式',
+      tAvatarReady: '头像已就绪，保存后生效', tWelcome: '欢迎回来，点击条目即可编辑',
+      tQrAdded: '二维码图片已添加', tQrTooLong: '内容过长，无法生成二维码',
+      tExported: '已导出 data.json，提交到仓库即可全局生效', tDataBig: '数据过大，图片请压缩后再上传'
+    },
+    en: {
+      docTitle: 'LANLINK · My Contact Card', langTitle: 'Switch language',
+      btnVcf: 'Save Contact', btnShare: 'QR Code', adminTitle: 'Admin login',
+      qrHint: 'Scan to add contact', countFmt: 'Contacts · {n}',
+      loginTitle: 'Admin Login', pwdLabel: 'Password', pwdPh: 'Enter admin password',
+      pwdErr: 'Incorrect password, try again', btnLogin: 'Enter Edit Mode',
+      qrSave: 'Download PNG', editTitle: 'Edit Profile', btnExport: 'Export data.json', btnLogout: 'Log Out',
+      uploadAvatar: 'Upload Avatar', removeAvatar: 'Remove',
+      fName: 'Name', fTitleLb: 'Title / Position', fOrg: 'Company / Team',
+      fTags: 'Tags', tagsTip: ' (comma separated)', tagsPh: 'e.g. Remote, Quick reply, Coffee lover',
+      contactItems: 'Contact Entries', btnAddContact: '+ Add', cancel: 'Cancel', savePublish: 'Save & Publish',
+      eLabel: 'Label', eValue: 'Value', eRemove: 'Delete entry',
+      eUploadQr: 'Upload QR image (optional)', eChangeQr: 'Replace QR image', eClearQr: 'Remove image', eHidden: 'Hidden',
+      types: { phone: 'Phone', email: 'Email', wechat: 'WeChat', qq: 'QQ', link: 'Website', github: 'GitHub', address: 'Address', other: 'Other' },
+      tCopied: 'Copied: ', tCopyFail: 'Copy failed, please copy manually', tSaved: 'Saved & published',
+      tNeedOne: 'Keep at least one contact entry', tImgBig: 'Image must be under 1.5MB', tLogout: 'Logged out of edit mode',
+      tAvatarReady: 'Avatar ready, applies after saving', tWelcome: 'Welcome back, click entries to edit',
+      tQrAdded: 'QR image added', tQrTooLong: 'Content too long for a QR code',
+      tExported: 'Exported data.json — commit it to the repo to publish', tDataBig: 'Data too large, please compress images'
+    },
+    th: {
+      docTitle: 'LANLINK · ข้อมูลติดต่อส่วนตัว', langTitle: 'เปลี่ยนภาษา',
+      btnVcf: 'บันทึกผู้ติดต่อ', btnShare: 'คิวอาร์โค้ด', adminTitle: 'เข้าสู่ระบบผู้ดูแล',
+      qrHint: 'สแกนเพื่อเพิ่มผู้ติดต่อ', countFmt: 'ผู้ติดต่อ · {n} รายการ',
+      loginTitle: 'เข้าสู่ระบบผู้ดูแล', pwdLabel: 'รหัสผ่าน', pwdPh: 'กรอกรหัสผ่านผู้ดูแล',
+      pwdErr: 'รหัสผ่านไม่ถูกต้อง กรุณาลองอีกครั้ง', btnLogin: 'เข้าสู่โหมดแก้ไข',
+      qrSave: 'ดาวน์โหลด PNG', editTitle: 'แก้ไขโปรไฟล์', btnExport: 'ส่งออก data.json', btnLogout: 'ออกจากระบบ',
+      uploadAvatar: 'อัปโหลดรูปโปรไฟล์', removeAvatar: 'ลบรูป',
+      fName: 'ชื่อ', fTitleLb: 'ตำแหน่ง', fOrg: 'บริษัท / ทีม',
+      fTags: 'แท็ก', tagsTip: ' (คั่นด้วยจุลภาค)', tagsPh: 'เช่น ทำงานระยะไกล, ตอบเร็ว, ชอบกาแฟ',
+      contactItems: 'รายการติดต่อ', btnAddContact: '+ เพิ่ม', cancel: 'ยกเลิก', savePublish: 'บันทึกและเผยแพร่',
+      eLabel: 'ชื่อรายการ', eValue: 'เนื้อหา', eRemove: 'ลบรายการ',
+      eUploadQr: 'อัปโหลดรูปคิวอาร์ (ไม่บังคับ)', eChangeQr: 'เปลี่ยนรูปคิวอาร์', eClearQr: 'ลบรูป', eHidden: 'ซ่อน',
+      types: { phone: 'โทรศัพท์', email: 'อีเมล', wechat: 'WeChat', qq: 'QQ', link: 'เว็บไซต์', github: 'GitHub', address: 'ที่อยู่', other: 'อื่น ๆ' },
+      tCopied: 'คัดลอกแล้ว: ', tCopyFail: 'คัดลอกไม่สำเร็จ กรุณาคัดลอกด้วยตนเอง', tSaved: 'บันทึกและเผยแพร่แล้ว',
+      tNeedOne: 'ต้องมีข้อมูลติดต่ออย่างน้อยหนึ่งรายการ', tImgBig: 'รูปภาพต้องมีขนาดไม่เกิน 1.5MB', tLogout: 'ออกจากโหมดแก้ไขแล้ว',
+      tAvatarReady: 'รูปโปรไฟล์พร้อมแล้ว จะแสดงหลังบันทึก', tWelcome: 'ยินดีต้อนรับ คลิกรายการเพื่อแก้ไข',
+      tQrAdded: 'เพิ่มรูปคิวอาร์แล้ว', tQrTooLong: 'เนื้อหายาวเกินไป สร้างคิวอาร์ไม่ได้',
+      tExported: 'ส่งออก data.json แล้ว อัปโหลดไปยัง repo เพื่อให้ทุกคนเห็น', tDataBig: 'ข้อมูลใหญ่เกินไป กรุณาบีบอัดรูปภาพ'
+    }
+  };
+  var LANG_KEYS = ['zh', 'en', 'th'];
+  var LANG_LABEL = { zh: '中', en: 'EN', th: 'ไทย' };
+  var LANG_HTML = { zh: 'zh-CN', en: 'en', th: 'th' };
+
+  function t(key) {
+    var d = I18N[state.lang] || I18N.zh;
+    if (d[key] !== undefined) return d[key];
+    if (I18N.zh[key] !== undefined) return I18N.zh[key];
+    return key;
+  }
+  function typeName(type) {
+    var m = t('types');
+    return m[type] || type;
+  }
 
   var DEFAULTS = {
     name: '林澜',
@@ -40,7 +119,24 @@
   );
 
   var $ = function (id) { return document.getElementById(id); };
-  var state = { data: null, isAdmin: false, editContacts: [], qrCurrent: null };
+  var state = { data: null, isAdmin: false, editContacts: [], qrCurrent: null, lang: 'zh' };
+
+  function applyLang() {
+    document.documentElement.lang = LANG_HTML[state.lang] || 'zh-CN';
+    document.title = t('docTitle');
+    $('btnLang').textContent = LANG_LABEL[state.lang] || '中';
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      el.textContent = t(el.getAttribute('data-i18n'));
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+      el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
+    });
+    document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
+      el.setAttribute('title', t(el.getAttribute('data-i18n-title')));
+    });
+    if (state.data) render();
+    if (!$('editorDrawer').hidden) renderEditContacts();
+  }
 
   /* ---------------- 数据读写 ---------------- */
   function loadData(cb) {
@@ -68,7 +164,7 @@
       if (c.value === undefined || c.value === null || String(c.value) === '') return;
       out.contacts.push({
         type: t,
-        label: String(c.label || TYPES[t].name).slice(0, 20),
+        label: String(c.label || typeName(t)).slice(0, 20),
         value: String(c.value).slice(0, 200),
         qrImage: typeof c.qrImage === 'string' ? c.qrImage : null,
         hidden: !!c.hidden
@@ -78,7 +174,7 @@
   }
   function persist() {
     try { localStorage.setItem(STORE_KEY, JSON.stringify(state.data)); }
-    catch (e) { toast('数据过大，图片请压缩后再上传'); }
+    catch (e) { toast(t('tDataBig')); }
   }
 
   /* ---------------- 渲染 ---------------- */
@@ -96,7 +192,7 @@
     var list = $('contactList');
     list.innerHTML = '';
     var visible = d.contacts.filter(function (c) { return !c.hidden; });
-    $('contactCount').textContent = '联系方式 · ' + visible.length + ' 条';
+    $('contactCount').textContent = t('countFmt').replace('{n}', visible.length);
     visible.forEach(function (c) {
       var meta = TYPES[c.type];
       var li = document.createElement('li');
@@ -208,7 +304,7 @@
         stage.appendChild(cv);
         state.qrCurrent = { kind: 'canvas', canvas: cv, name: title || 'vcard' };
       } catch (e) {
-        stage.innerHTML = '<p style="font-size:13px;color:#5d5580">内容过长，无法生成二维码</p>';
+        stage.innerHTML = '<p style="font-size:13px;color:#5d5580">' + escapeHtml(t('tQrTooLong')) + '</p>';
       }
     }
     showModal('qrModal');
@@ -257,26 +353,26 @@
       var row = document.createElement('div');
       row.className = 'ce-row';
       var opts = Object.keys(TYPES).map(function (k) {
-        return '<option value="' + k + '"' + (c.type === k ? ' selected' : '') + '>' + TYPES[k].name + '</option>';
+        return '<option value="' + k + '"' + (c.type === k ? ' selected' : '') + '>' + escapeHtml(typeName(k)) + '</option>';
       }).join('');
       row.innerHTML =
         '<div class="ce-row-top">' +
         '<select data-k="type">' + opts + '</select>' +
-        '<div class="field"><label>名称</label><input type="text" data-k="label" maxlength="20" value="' + escapeAttr(c.label) + '"></div>' +
-        '<button class="ce-remove" title="删除条目" type="button">×</button>' +
+        '<div class="field"><label>' + escapeHtml(t('eLabel')) + '</label><input type="text" data-k="label" maxlength="20" value="' + escapeAttr(c.label) + '"></div>' +
+        '<button class="ce-remove" title="' + escapeAttr(t('eRemove')) + '" type="button">×</button>' +
         '</div>' +
-        '<div class="field"><label>内容</label><input type="text" data-k="value" maxlength="200" value="' + escapeAttr(c.value) + '"></div>' +
+        '<div class="field"><label>' + escapeHtml(t('eValue')) + '</label><input type="text" data-k="value" maxlength="200" value="' + escapeAttr(c.value) + '"></div>' +
         '<div class="ce-qr-line">' +
-        '<button class="link-btn" data-act="upload-qr" type="button">' + (c.qrImage ? '更换二维码图' : '上传二维码图（可选，如微信二维码截图）') + '</button>' +
-        (c.qrImage ? '<img class="ce-qr-thumb" src="' + c.qrImage + '" alt="二维码缩略图"><button class="link-btn" data-act="clear-qr" type="button">移除图片</button>' : '') +
-        '<label class="link-btn" style="display:inline-flex;align-items:center;gap:5px;margin-left:auto;cursor:pointer"><input type="checkbox" data-k="hidden"' + (c.hidden ? ' checked' : '') + ' style="accent-color:#5b3df5">隐藏</label>' +
+        '<button class="link-btn" data-act="upload-qr" type="button">' + escapeHtml(c.qrImage ? t('eChangeQr') : t('eUploadQr')) + '</button>' +
+        (c.qrImage ? '<img class="ce-qr-thumb" src="' + c.qrImage + '" alt="QR"><button class="link-btn" data-act="clear-qr" type="button">' + escapeHtml(t('eClearQr')) + '</button>' : '') +
+        '<label class="link-btn" style="display:inline-flex;align-items:center;gap:5px;margin-left:auto;cursor:pointer"><input type="checkbox" data-k="hidden"' + (c.hidden ? ' checked' : '') + ' style="accent-color:#5b3df5">' + escapeHtml(t('eHidden')) + '</label>' +
         '</div>';
       var sel = row.querySelector('select');
       sel.addEventListener('change', function () {
         c.type = sel.value;
         if (!row.querySelector('[data-k="label"]').value) {
-          row.querySelector('[data-k="label"]').value = TYPES[c.type].name;
-          c.label = TYPES[c.type].name;
+          row.querySelector('[data-k="label"]').value = typeName(c.type);
+          c.label = typeName(c.type);
         }
       });
       row.querySelector('[data-k="label"]').addEventListener('input', function () { c.label = this.value; });
@@ -290,7 +386,7 @@
         pickImage(function (dataUrl) {
           c.qrImage = dataUrl;
           renderEditContacts();
-          toast('二维码图片已添加');
+          toast(t('tQrAdded'));
         });
       });
       var clearBtn = row.querySelector('[data-act="clear-qr"]');
@@ -309,7 +405,7 @@
     input.addEventListener('change', function () {
       var f = input.files && input.files[0];
       if (!f) return;
-      if (f.size > 1.5 * 1024 * 1024) { toast('图片请小于 1.5MB'); return; }
+      if (f.size > 1.5 * 1024 * 1024) { toast(t('tImgBig')); return; }
       var fr = new FileReader();
       fr.onload = function () { cb(fr.result); };
       fr.readAsDataURL(f);
@@ -326,7 +422,7 @@
   function escapeAttr(s) { return escapeHtml(s); }
 
   function copyText(text) {
-    var done = function () { toast('已复制：' + (text.length > 18 ? text.slice(0, 18) + '…' : text)); };
+    var done = function () { toast(t('tCopied') + (text.length > 18 ? text.slice(0, 18) + '…' : text)); };
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(done, function () { legacyCopy(text, done); });
     } else { legacyCopy(text, done); }
@@ -337,7 +433,7 @@
     ta.style.cssText = 'position:fixed;opacity:0';
     document.body.appendChild(ta);
     ta.select();
-    try { document.execCommand('copy'); done(); } catch (e) { toast('复制失败，请手动复制'); }
+    try { document.execCommand('copy'); done(); } catch (e) { toast(t('tCopyFail')); }
     document.body.removeChild(ta);
   }
 
@@ -405,16 +501,23 @@
     $('avatarFile').addEventListener('change', function () {
       var f = this.files && this.files[0];
       if (!f) return;
-      if (f.size > 1.5 * 1024 * 1024) { toast('头像请小于 1.5MB'); this.value = ''; return; }
+      if (f.size > 1.5 * 1024 * 1024) { toast(t('tImgBig')); this.value = ''; return; }
       var fr = new FileReader();
       var self = this;
       fr.onload = function () {
         state.editAvatar = fr.result;
         $('editAvatarImg').src = fr.result;
-        toast('头像已就绪，保存后生效');
+        toast(t('tAvatarReady'));
       };
       fr.readAsDataURL(f);
       self.value = '';
+    });
+
+    $('btnLang').addEventListener('click', function () {
+      var i = LANG_KEYS.indexOf(state.lang);
+      state.lang = LANG_KEYS[(i + 1) % LANG_KEYS.length];
+      try { localStorage.setItem(LANG_STORE, state.lang); } catch (e) { /* 忽略 */ }
+      applyLang();
     });
     $('btnAvatarRemove').addEventListener('click', function () {
       state.editAvatar = null;
@@ -437,12 +540,12 @@
       d.tags = $('fTags').value.split(/[,，、]/).map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 8);
       d.avatar = state.editAvatar !== undefined ? state.editAvatar : d.avatar;
       d.contacts = state.editContacts.filter(function (c) { return c.value.trim() !== ''; })
-        .map(function (c) { return { type: c.type, label: c.label || TYPES[c.type].name, value: c.value.trim(), qrImage: c.qrImage, hidden: !!c.hidden }; });
-      if (!d.contacts.length) { toast('至少保留一条联系方式'); return; }
+        .map(function (c) { return { type: c.type, label: c.label || typeName(c.type), value: c.value.trim(), qrImage: c.qrImage, hidden: !!c.hidden }; });
+      if (!d.contacts.length) { toast(t('tNeedOne')); return; }
       persist();
       render();
       closeEditor();
-      toast('已保存并发布');
+      toast(t('tSaved'));
     });
 
     $('btnCancelEdit').addEventListener('click', closeEditor);
@@ -453,13 +556,13 @@
       var url = URL.createObjectURL(blob);
       download('data.json', url);
       setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
-      toast('已导出 data.json，提交到仓库即可全局生效');
+      toast(t('tExported'));
     });
 
     $('btnLogout').addEventListener('click', function () {
       setAdmin(false);
       closeEditor();
-      toast('已退出编辑模式');
+      toast(t('tLogout'));
     });
   }
 
@@ -469,7 +572,7 @@
       setAdmin(true);
       hideModal('loginModal');
       openEditor();
-      toast('欢迎回来，点击条目即可编辑');
+      toast(t('tWelcome'));
     } else {
       $('pwdErr').hidden = false;
     }
@@ -477,11 +580,13 @@
 
   /* ---------------- 启动 ---------------- */
   function init() {
+    try { state.lang = localStorage.getItem(LANG_STORE) || 'zh'; } catch (e) { state.lang = 'zh'; }
+    if (LANG_KEYS.indexOf(state.lang) < 0) state.lang = 'zh';
     bind();
     loadData(function (d) {
       state.data = d;
       state.editAvatar = d.avatar;
-      render();
+      applyLang();
       if (sessionStorage.getItem(SESSION_KEY) === '1') setAdmin(true);
     });
   }
