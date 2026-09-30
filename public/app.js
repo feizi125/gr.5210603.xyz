@@ -385,8 +385,6 @@
       });
       list.appendChild(li);
     });
-
-    renderVcfQr();
   }
 
   function buildVcard() {
@@ -405,11 +403,6 @@
     });
     lines.push('END:VCARD');
     return lines.join('\n');
-  }
-
-  function renderVcfQr() {
-    try { drawQr($('pQrCanvas'), buildVcard(), 336); }
-    catch (e) { /* 内容过长时静默 */ }
   }
 
   /* ---------------- 二维码 ---------------- */
@@ -694,7 +687,6 @@
     });
 
     $('btnShare').addEventListener('click', function () { openQr(t('myQr'), null); });
-    $('pQrCanvas').addEventListener('click', function () { openQr(t('myQr'), null); });
 
     $('btnQrSave').addEventListener('click', function () {
       var q = state.qrCurrent;
