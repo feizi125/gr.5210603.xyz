@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>澜联 LANLINK · 个人联系方式</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="aurora" aria-hidden="true">
+  <span class="blob b1"></span>
+  <span class="blob b2"></span>
+  <span class="blob b3"></span>
+  <span class="grain"></span>
+</div>
+
+<header class="topbar">
+  <div class="logo">
+    <span class="logo-mark"></span>
+    <span class="logo-text">澜联<i>LANLINK</i></span>
+  </div>
+  <div class="top-actions">
+    <button class="pill-btn" id="btnVcf" type="button">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+      保存联系人
+    </button>
+    <button class="pill-btn ghost" id="btnShare" type="button">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/></svg>
+      二维码
+    </button>
+    <button class="gear" id="btnAdmin" type="button" title="管理登录" aria-label="管理登录">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="stage">
+
+  <section class="profile-card" id="profileCard">
+    <div class="ripple-bg" aria-hidden="true"></div>
+    <div class="avatar-wrap">
+      <div class="avatar-ring"></div>
+      <img id="avatarImg" src="" alt="头像" class="avatar">
+    </div>
+    <h1 class="p-name" id="pName"></h1>
+    <p class="p-title" id="pTitle"></p>
+    <div class="p-tags" id="pTags"></div>
+    <div class="p-qr" id="pQrBox">
+      <canvas id="pQrCanvas"></canvas>
+      <span class="p-qr-hint">扫码添加联系人</span>
+    </div>
+  </section>
+
+  <section class="contact-col">
+    <div class="contact-head">
+      <span class="contact-count" id="contactCount"></span>
+    </div>
+    <ul class="contact-list" id="contactList"></ul>
+  </section>
+
+</main>
+
+<!-- 登录弹窗 -->
+<div class="modal-mask" id="loginModal" hidden>
+  <div class="modal glass">
+    <button class="modal-x" data-close="loginModal" type="button" aria-label="关闭">×</button>
+    <h2 class="modal-title">管理员登录</h2>
+    <div class="field">
+      <label for="pwdInput">访问密码</label>
+      <input type="password" id="pwdInput" placeholder="请输入管理密码" autocomplete="off">
+    </div>
+    <p class="field-err" id="pwdErr" hidden>密码不正确，请重试</p>
+    <button class="pill-btn wide" id="btnLogin" type="button">进入编辑模式</button>
+  </div>
+</div>
+
+<!-- 二维码弹窗 -->
+<div class="modal-mask" id="qrModal" hidden>
+  <div class="modal glass qr-modal">
+    <button class="modal-x" data-close="qrModal" type="button" aria-label="关闭">×</button>
+    <h2 class="modal-title" id="qrTitle">二维码</h2>
+    <div class="qr-stage" id="qrStage"></div>
+    <button class="pill-btn ghost wide" id="btnQrSave" type="button">下载 PNG</button>
+  </div>
+</div>
+
+<!-- 编辑抽屉 -->
+<aside class="drawer" id="editorDrawer" hidden>
+  <div class="drawer-head">
+    <h2>编辑资料</h2>
+    <div class="drawer-head-btns">
+      <button class="pill-btn small" id="btnExport" type="button">导出 data.json</button>
+      <button class="pill-btn small ghost" id="btnLogout" type="button">退出登录</button>
+    </div>
+  </div>
+
+  <div class="drawer-body">
+
+    <div class="edit-avatar">
+      <img id="editAvatarImg" src="" alt="头像预览">
+      <div class="edit-avatar-ops">
+        <label class="pill-btn small" for="avatarFile">上传头像</label>
+        <input type="file" id="avatarFile" accept="image/*" hidden>
+        <button class="link-btn" id="btnAvatarRemove" type="button">移除头像</button>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="fName">姓名</label>
+        <input type="text" id="fName" maxlength="24">
+      </div>
+      <div class="field">
+        <label for="fTitle">职位 / 头衔</label>
+        <input type="text" id="fTitle" maxlength="40">
+      </div>
+    </div>
+    <div class="field">
+      <label for="fOrg">公司 / 团队</label>
+      <input type="text" id="fOrg" maxlength="40">
+    </div>
+    <div class="field">
+      <label for="fTags">个性标签<span class="tip">（用逗号分隔）</span></label>
+      <input type="text" id="fTags" maxlength="60" placeholder="例如：远程协作, 周末咖啡, 快速回复">
+    </div>
+
+    <div class="contact-edit-head">
+      <span>联系方式条目</span>
+      <button class="pill-btn small" id="btnAddContact" type="button">+ 添加</button>
+    </div>
+    <div class="contact-edit-list" id="contactEditList"></div>
+
+  </div>
+
+  <div class="drawer-foot">
+    <button class="pill-btn ghost" id="btnCancelEdit" type="button">取消</button>
+    <button class="pill-btn wide" id="btnSaveEdit" type="button">保存并发布</button>
+  </div>
+</aside>
+<div class="drawer-mask" id="drawerMask" hidden></div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="lib/qrcode.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
