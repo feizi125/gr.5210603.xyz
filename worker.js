@@ -53,7 +53,7 @@ export default {
       return jsonRes({ ok: true });
     }
 
-    if (url.pathname === '/admin') {
+    if (url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '/admin') {
       return env.ASSETS.fetch(new Request(new URL('/index.html', url), request));
     }
 
