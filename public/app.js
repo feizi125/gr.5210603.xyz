@@ -32,7 +32,8 @@
       gbEmpty: '你还没有留言，写下第一条吧（仅你和站长可见）', gbAnonymous: '游客', gbOk: '留言成功，仅你和站长可见',
       gbNeedText: '请输入留言内容', gbManage: '留言管理（仅站长可见）', gbDel: '删除留言', gbNoMsg: '暂无留言',
       gbNote: '留言提交后仅你自己和站长可见，其他访客无法查看',
-      gbCustomHead: '留言板文案（自定义提示词，留空用默认）',
+      gbCustomHead: '留言板文案（分语言自定义）',
+      gbLangTip: '按语言分别填写，留空用该语言默认',
       fGbTitle: '区块标题', fGbNamePh: '昵称框提示', fGbTextPh: '留言框提示', fGbSubmit: '按钮文字', fGbNote: '隐私提示',
       gbFail: '操作失败，请稍后再试', gbDelOk: '留言已删除',
       tWelcome: '欢迎回来，点击条目即可编辑',
@@ -63,7 +64,8 @@
       gbEmpty: 'You have not posted yet. Your message stays private (visible only to you and the owner)', gbAnonymous: 'Guest', gbOk: 'Posted! Only you and the owner can see it',
       gbNeedText: 'Please enter a message', gbManage: 'Manage Messages (owner only)', gbDel: 'Delete', gbNoMsg: 'No messages',
       gbNote: 'Only you and the site owner can see your message',
-      gbCustomHead: 'Guestbook Texts (custom, blank = default)',
+      gbCustomHead: 'Guestbook Texts (per language)',
+      gbLangTip: 'Fill per language; blank = default for that language',
       fGbTitle: 'Section title', fGbNamePh: 'Name hint', fGbTextPh: 'Message hint', fGbSubmit: 'Button text', fGbNote: 'Privacy note',
       gbFail: 'Failed, please try again later', gbDelOk: 'Message deleted',
       tWelcome: 'Welcome back, click entries to edit',
@@ -94,7 +96,8 @@
       gbEmpty: 'คุณยังไม่ได้เขียนข้อความ (เฉพาะคุณและเจ้าของเว็บเท่านั้นที่เห็น)', gbAnonymous: 'ผู้เยี่ยมชม', gbOk: 'ส่งแล้ว! เฉพาะคุณและเจ้าของเว็บเท่านั้นที่เห็น',
       gbNeedText: 'กรุณาพิมพ์ข้อความ', gbManage: 'จัดการข้อความ (เจ้าของเว็บเท่านั้น)', gbDel: 'ลบ', gbNoMsg: 'ไม่มีข้อความ',
       gbNote: 'เฉพาะคุณและเจ้าของเว็บเท่านั้นที่เห็นข้อความนี้',
-      gbCustomHead: 'ข้อความกระดาน (กำหนดเอง เว้นว่าง = ค่าเริ่มต้น)',
+      gbCustomHead: 'ข้อความกระดาน (แยกตามภาษา)',
+      gbLangTip: 'กรอกแยกตามภาษา เว้นว่าง = ค่าเริ่มต้นของภาษานั้น',
       fGbTitle: 'ชื่อส่วน', fGbNamePh: 'คำใบ้ชื่อ', fGbTextPh: 'คำใบ้ข้อความ', fGbSubmit: 'ข้อความปุ่ม', fGbNote: 'หมายเหตุความเป็นส่วนตัว',
       gbFail: 'ดำเนินการไม่สำเร็จ ลองอีกครั้ง', gbDelOk: 'ลบข้อความแล้ว',
       tWelcome: 'ยินดีต้อนรับ คลิกรายการเพื่อแก้ไข',
@@ -173,7 +176,7 @@
   };
 
   var $ = function (id) { return document.getElementById(id); };
-  var state = { data: null, isAdmin: false, editContacts: [], editAvatar: null, qrCurrent: null, lang: 'zh', source: 'default', pass: null, visits: null, messages: [], myMsgs: [] };
+  var state = { data: null, isAdmin: false, editContacts: [], editAvatar: null, qrCurrent: null, lang: 'zh', source: 'default', pass: null, visits: null, messages: [], myMsgs: [], gbEdit: null, gbEditLang: 'zh' };
 
   function applyLang() {
     document.documentElement.lang = LANG_HTML[state.lang] || 'zh-CN';
@@ -314,14 +317,47 @@
       .catch(function () { state.source = 'default'; cb(normalize(null)); });
   }
   function normalizeGb(g) {
-    g = g && typeof g === 'object' ? g : {};
     var s = function (v) { return typeof v === 'string' ? v.slice(0, 60) : ''; };
-    return { title: s(g.title), namePh: s(g.namePh), textPh: s(g.textPh), submit: s(g.submit), note: s(g.note) };
+    var one = function (o) {
+      o = o && typeof o === 'object' ? o : {};
+      return { title: s(o.title), namePh: s(o.namePh), textPh: s(o.textPh), submit: s(o.submit), note: s(o.note) };
+    };
+    /* 兼容旧版扁平结构：视为中文自定义 */
+    if (g && typeof g === 'object' && !g.zh && !g.en && !g.th) {
+      return { zh: one(g), en: one(null), th: one(null) };
+    }
+    g = g && typeof g === 'object' ? g : {};
+    return { zh: one(g.zh), en: one(g.en), th: one(g.th) };
   }
-  /* 自定义留言板文案优先，空则用当前语言默认 */
+  /* 当前语言的自定义文案优先，空则用该语言默认 */
   function gbText(key) {
-    var g = state.data && state.data.gb ? state.data.gb : null;
+    var all = state.data && state.data.gb ? state.data.gb : null;
+    var g = all && all[state.lang] ? all[state.lang] : null;
     return (g && g[key]) || t(key === 'title' ? 'gbTitle' : key === 'namePh' ? 'gbNamePh' : key === 'textPh' ? 'gbTextPh' : key === 'submit' ? 'gbSubmit' : 'gbNote');
+  }
+  /* 后台分语言编辑留言板文案 */
+  function harvestGbEdit() {
+    if (!state.gbEdit) state.gbEdit = {};
+    if (!state.gbEdit[state.gbEditLang]) state.gbEdit[state.gbEditLang] = {};
+    state.gbEdit[state.gbEditLang] = {
+      title: ($('fGbTitle').value || '').trim(),
+      namePh: ($('fGbNamePh').value || '').trim(),
+      textPh: ($('fGbTextPh').value || '').trim(),
+      submit: ($('fGbSubmit').value || '').trim(),
+      note: ($('fGbNote').value || '').trim()
+    };
+  }
+  function fillGbEdit() {
+    var g = (state.gbEdit && state.gbEdit[state.gbEditLang]) || {};
+    $('fGbTitle').value = g.title || '';
+    $('fGbNamePh').value = g.namePh || '';
+    $('fGbTextPh').value = g.textPh || '';
+    $('fGbSubmit').value = g.submit || '';
+    $('fGbNote').value = g.note || '';
+    document.querySelectorAll('.gb-lang').forEach(function (b) {
+      b.classList.toggle('on', b.getAttribute('data-lang') === state.gbEditLang);
+      b.classList.toggle('ghost', b.getAttribute('data-lang') !== state.gbEditLang);
+    });
   }
   function applyGuestbookTexts() {
     var el = $('gbTitleEl');
@@ -526,12 +562,8 @@
     $('fTitle').value = d.title;
     $('fOrg').value = d.org;
     $('fTags').value = d.tags.join(', ');
-    var g = d.gb || {};
-    $('fGbTitle').value = g.title || '';
-    $('fGbNamePh').value = g.namePh || '';
-    $('fGbTextPh').value = g.textPh || '';
-    $('fGbSubmit').value = g.submit || '';
-    $('fGbNote').value = g.note || '';
+    state.gbEdit = d.gb || { zh: {}, en: {}, th: {} };
+    fillGbEdit();
     state.editAvatar = d.avatar || null;
     updateAvatarEdit();
     state.editContacts = d.contacts.map(function (c) {
@@ -771,6 +803,14 @@
       if (last) last.querySelector('[data-k="value"]').focus();
     });
 
+    document.querySelectorAll('.gb-lang').forEach(function (b) {
+      b.addEventListener('click', function () {
+        harvestGbEdit();
+        state.gbEditLang = b.getAttribute('data-lang');
+        fillGbEdit();
+      });
+    });
+
     $('btnSaveEdit').addEventListener('click', function () {
       var d = state.data;
       d.name = ($('fName').value || '').trim() || t('tUnnamed');
@@ -778,13 +818,8 @@
       d.org = ($('fOrg').value || '').trim();
       d.tags = $('fTags').value.split(/[,，、]/).map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 8);
       d.avatar = state.editAvatar;
-      d.gb = {
-        title: ($('fGbTitle').value || '').trim(),
-        namePh: ($('fGbNamePh').value || '').trim(),
-        textPh: ($('fGbTextPh').value || '').trim(),
-        submit: ($('fGbSubmit').value || '').trim(),
-        note: ($('fGbNote').value || '').trim()
-      };
+      harvestGbEdit();
+      d.gb = state.gbEdit;
       applyGuestbookTexts();
       d.contacts = state.editContacts.filter(function (c) { return c.value.trim() !== ''; })
         .map(function (c) { return { type: c.type, label: c.label || typeName(c.type), value: c.value.trim(), qrImage: c.qrImage, hidden: !!c.hidden }; });
