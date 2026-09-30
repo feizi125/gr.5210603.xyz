@@ -21,7 +21,6 @@
       pwdErr: '密码不正确，请重试', btnLogin: '进入编辑模式',
       myQr: '我的二维码', copyTip: '复制', qrTip: '二维码', tUnnamed: '未命名',
       qrSave: '下载 PNG', editTitle: '编辑资料', btnExport: '导出 data.json', btnLogout: '退出登录',
-      uploadAvatar: '上传头像', removeAvatar: '移除头像',
       fName: '姓名', fTitleLb: '职位 / 头衔', fOrg: '公司 / 团队',
       fTags: '个性标签', tagsTip: '（用逗号分隔）', tagsPh: '例如：远程协作, 周末咖啡, 快速回复',
       contactItems: '联系方式条目', btnAddContact: '+ 添加', cancel: '取消', savePublish: '保存并发布',
@@ -30,7 +29,7 @@
       types: { phone: '电话', email: '邮箱', wechat: '微信', qq: 'QQ', whatsapp: 'WhatsApp', telegram: 'Telegram', instagram: 'Instagram', x: 'X（推特）', linkedin: 'LinkedIn', line: 'LINE', link: '网址', github: 'GitHub', address: '地址', other: '其他' },
       tCopied: '已复制：', tCopyFail: '复制失败，请手动复制', tSaved: '已保存并发布',
       tNeedOne: '至少保留一条联系方式', tImgBig: '图片请小于 1.5MB', tLogout: '已退出编辑模式',
-      tAvatarReady: '头像已就绪，保存后生效', tWelcome: '欢迎回来，点击条目即可编辑',
+      tWelcome: '欢迎回来，点击条目即可编辑',
       tQrAdded: '二维码图片已添加', tQrTooLong: '内容过长，无法生成二维码',
       tExported: '已导出 data.json，提交到仓库即可全局生效', tDataBig: '数据过大，图片请压缩后再上传'
     },
@@ -42,7 +41,6 @@
       pwdErr: 'Incorrect password, try again', btnLogin: 'Enter Edit Mode',
       myQr: 'My QR Code', copyTip: 'Copy', qrTip: 'QR Code', tUnnamed: 'Unnamed',
       qrSave: 'Download PNG', editTitle: 'Edit Profile', btnExport: 'Export data.json', btnLogout: 'Log Out',
-      uploadAvatar: 'Upload Avatar', removeAvatar: 'Remove',
       fName: 'Name', fTitleLb: 'Title / Position', fOrg: 'Company / Team',
       fTags: 'Tags', tagsTip: ' (comma separated)', tagsPh: 'e.g. Remote, Quick reply, Coffee lover',
       contactItems: 'Contact Entries', btnAddContact: '+ Add', cancel: 'Cancel', savePublish: 'Save & Publish',
@@ -51,7 +49,7 @@
       types: { phone: 'Phone', email: 'Email', wechat: 'WeChat', qq: 'QQ', whatsapp: 'WhatsApp', telegram: 'Telegram', instagram: 'Instagram', x: 'X (Twitter)', linkedin: 'LinkedIn', line: 'LINE', link: 'Website', github: 'GitHub', address: 'Address', other: 'Other' },
       tCopied: 'Copied: ', tCopyFail: 'Copy failed, please copy manually', tSaved: 'Saved & published',
       tNeedOne: 'Keep at least one contact entry', tImgBig: 'Image must be under 1.5MB', tLogout: 'Logged out of edit mode',
-      tAvatarReady: 'Avatar ready, applies after saving', tWelcome: 'Welcome back, click entries to edit',
+      tWelcome: 'Welcome back, click entries to edit',
       tQrAdded: 'QR image added', tQrTooLong: 'Content too long for a QR code',
       tExported: 'Exported data.json — commit it to the repo to publish', tDataBig: 'Data too large, please compress images'
     },
@@ -63,7 +61,6 @@
       pwdErr: 'รหัสผ่านไม่ถูกต้อง กรุณาลองอีกครั้ง', btnLogin: 'เข้าสู่โหมดแก้ไข',
       myQr: 'คิวอาร์ของฉัน', copyTip: 'คัดลอก', qrTip: 'คิวอาร์โค้ด', tUnnamed: 'ไม่มีชื่อ',
       qrSave: 'ดาวน์โหลด PNG', editTitle: 'แก้ไขโปรไฟล์', btnExport: 'ส่งออก data.json', btnLogout: 'ออกจากระบบ',
-      uploadAvatar: 'อัปโหลดรูปโปรไฟล์', removeAvatar: 'ลบรูป',
       fName: 'ชื่อ', fTitleLb: 'ตำแหน่ง', fOrg: 'บริษัท / ทีม',
       fTags: 'แท็ก', tagsTip: ' (คั่นด้วยจุลภาค)', tagsPh: 'เช่น ทำงานระยะไกล, ตอบเร็ว, ชอบกาแฟ',
       contactItems: 'รายการติดต่อ', btnAddContact: '+ เพิ่ม', cancel: 'ยกเลิก', savePublish: 'บันทึกและเผยแพร่',
@@ -72,7 +69,7 @@
       types: { phone: 'โทรศัพท์', email: 'อีเมล', wechat: 'WeChat', qq: 'QQ', whatsapp: 'WhatsApp', telegram: 'Telegram', instagram: 'Instagram', x: 'X (Twitter)', linkedin: 'LinkedIn', line: 'LINE', link: 'เว็บไซต์', github: 'GitHub', address: 'ที่อยู่', other: 'อื่น ๆ' },
       tCopied: 'คัดลอกแล้ว: ', tCopyFail: 'คัดลอกไม่สำเร็จ กรุณาคัดลอกด้วยตนเอง', tSaved: 'บันทึกและเผยแพร่แล้ว',
       tNeedOne: 'ต้องมีข้อมูลติดต่ออย่างน้อยหนึ่งรายการ', tImgBig: 'รูปภาพต้องมีขนาดไม่เกิน 1.5MB', tLogout: 'ออกจากโหมดแก้ไขแล้ว',
-      tAvatarReady: 'รูปโปรไฟล์พร้อมแล้ว จะแสดงหลังบันทึก', tWelcome: 'ยินดีต้อนรับ คลิกรายการเพื่อแก้ไข',
+      tWelcome: 'ยินดีต้อนรับ คลิกรายการเพื่อแก้ไข',
       tQrAdded: 'เพิ่มรูปคิวอาร์แล้ว', tQrTooLong: 'เนื้อหายาวเกินไป สร้างคิวอาร์ไม่ได้',
       tExported: 'ส่งออก data.json แล้ว อัปโหลดไปยัง repo เพื่อให้ทุกคนเห็น', tDataBig: 'ข้อมูลใหญ่เกินไป กรุณาบีบอัดรูปภาพ'
     }
@@ -145,10 +142,6 @@
     other:  { name: '其他', icon: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>' }
   };
 
-  var PLACEHOLDER_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="36" r="17" fill="rgba(91,61,245,.5)"/><path d="M18 92c3-19 15-28 32-28s29 9 32 28z" fill="rgba(91,61,245,.5)"/></svg>'
-  );
-
   var $ = function (id) { return document.getElementById(id); };
   var state = { data: null, isAdmin: false, editContacts: [], qrCurrent: null, lang: 'zh', source: 'default' };
 
@@ -213,9 +206,6 @@
   /* ---------------- 渲染 ---------------- */
   function render() {
     var d = state.data;
-    var av = $('avatarImg');
-    if (d.avatar) { av.src = d.avatar; av.classList.remove('empty'); }
-    else { av.src = PLACEHOLDER_AVATAR; av.classList.add('empty'); }
     $('pName').textContent = d.name;
     $('pTitle').textContent = [d.title, d.org].filter(Boolean).join(' · ');
     $('pTags').innerHTML = d.tags.map(function (t) {
@@ -366,9 +356,6 @@
     $('fTitle').value = d.title;
     $('fOrg').value = d.org;
     $('fTags').value = d.tags.join(', ');
-    var ea = $('editAvatarImg');
-    if (d.avatar) { ea.src = d.avatar; }
-    else { ea.src = PLACEHOLDER_AVATAR; }
     state.editContacts = d.contacts.map(function (c) {
       return { type: c.type, label: c.label, value: c.value, qrImage: c.qrImage, hidden: !!c.hidden };
     });
@@ -533,30 +520,11 @@
       else download(q.name + '.png', q.src);
     });
 
-    $('avatarFile').addEventListener('change', function () {
-      var f = this.files && this.files[0];
-      if (!f) return;
-      if (f.size > 1.5 * 1024 * 1024) { toast(t('tImgBig')); this.value = ''; return; }
-      var fr = new FileReader();
-      var self = this;
-      fr.onload = function () {
-        state.editAvatar = fr.result;
-        $('editAvatarImg').src = fr.result;
-        toast(t('tAvatarReady'));
-      };
-      fr.readAsDataURL(f);
-      self.value = '';
-    });
-
     $('btnLang').addEventListener('click', function () {
       var i = LANG_KEYS.indexOf(state.lang);
       state.lang = LANG_KEYS[(i + 1) % LANG_KEYS.length];
       try { localStorage.setItem(LANG_STORE, state.lang); } catch (e) { /* 忽略 */ }
       applyLang();
-    });
-    $('btnAvatarRemove').addEventListener('click', function () {
-      state.editAvatar = null;
-      $('editAvatarImg').src = PLACEHOLDER_AVATAR;
     });
 
     $('btnAddContact').addEventListener('click', function () {
@@ -573,7 +541,7 @@
       d.title = ($('fTitle').value || '').trim();
       d.org = ($('fOrg').value || '').trim();
       d.tags = $('fTags').value.split(/[,，、]/).map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 8);
-      d.avatar = state.editAvatar !== undefined ? state.editAvatar : d.avatar;
+      d.avatar = null;
       d.contacts = state.editContacts.filter(function (c) { return c.value.trim() !== ''; })
         .map(function (c) { return { type: c.type, label: c.label || typeName(c.type), value: c.value.trim(), qrImage: c.qrImage, hidden: !!c.hidden }; });
       if (!d.contacts.length) { toast(t('tNeedOne')); return; }
@@ -620,7 +588,6 @@
     bind();
     loadData(function (d) {
       state.data = d;
-      state.editAvatar = d.avatar;
       applyLang();
       if (sessionStorage.getItem(SESSION_KEY) === '1') setAdmin(true);
     });
