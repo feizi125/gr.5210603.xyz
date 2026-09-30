@@ -33,7 +33,9 @@
       gbNeedText: '请输入留言内容', gbManage: '留言管理（仅站长可见）', gbDel: '删除留言', gbNoMsg: '暂无留言',
       gbNote: '留言提交后仅你自己和站长可见，其他访客无法查看',
       gbCustomHead: '留言板文案（分语言自定义）',
-      gbLangTip: '按语言分别填写，留空用该语言默认',
+      gbLangTip: '编辑语言：公告与留言板文案共用',
+      annHead: '网站公告', annTip: '（留空不显示）', annLabel: '公告内容',
+      annPh: '要向访问者展示的内容…（支持换行）',
       fGbTitle: '区块标题', fGbNamePh: '昵称框提示', fGbTextPh: '留言框提示', fGbSubmit: '按钮文字', fGbNote: '隐私提示',
       gbFail: '操作失败，请稍后再试', gbDelOk: '留言已删除',
       tWelcome: '欢迎回来，点击条目即可编辑',
@@ -65,7 +67,9 @@
       gbNeedText: 'Please enter a message', gbManage: 'Manage Messages (owner only)', gbDel: 'Delete', gbNoMsg: 'No messages',
       gbNote: 'Only you and the site owner can see your message',
       gbCustomHead: 'Guestbook Texts (per language)',
-      gbLangTip: 'Fill per language; blank = default for that language',
+      gbLangTip: 'Edit language: shared by announcement & guestbook texts',
+      annHead: 'Announcement', annTip: '(blank = hidden)', annLabel: 'Content',
+      annPh: 'What you want to tell visitors… (line breaks supported)',
       fGbTitle: 'Section title', fGbNamePh: 'Name hint', fGbTextPh: 'Message hint', fGbSubmit: 'Button text', fGbNote: 'Privacy note',
       gbFail: 'Failed, please try again later', gbDelOk: 'Message deleted',
       tWelcome: 'Welcome back, click entries to edit',
@@ -97,7 +101,9 @@
       gbNeedText: 'กรุณาพิมพ์ข้อความ', gbManage: 'จัดการข้อความ (เจ้าของเว็บเท่านั้น)', gbDel: 'ลบ', gbNoMsg: 'ไม่มีข้อความ',
       gbNote: 'เฉพาะคุณและเจ้าของเว็บเท่านั้นที่เห็นข้อความนี้',
       gbCustomHead: 'ข้อความกระดาน (แยกตามภาษา)',
-      gbLangTip: 'กรอกแยกตามภาษา เว้นว่าง = ค่าเริ่มต้นของภาษานั้น',
+      gbLangTip: 'ภาษาที่แก้ไข: ใช้ร่วมกับประกาศและข้อความกระดาน',
+      annHead: 'ประกาศเว็บไซต์', annTip: '(เว้นว่าง = ไม่แสดง)', annLabel: 'เนื้อหาประกาศ',
+      annPh: 'สิ่งที่ต้องการบอกผู้เยี่ยมชม… (ขึ้นบรรทัดใหม่ได้)',
       fGbTitle: 'ชื่อส่วน', fGbNamePh: 'คำใบ้ชื่อ', fGbTextPh: 'คำใบ้ข้อความ', fGbSubmit: 'ข้อความปุ่ม', fGbNote: 'หมายเหตุความเป็นส่วนตัว',
       gbFail: 'ดำเนินการไม่สำเร็จ ลองอีกครั้ง', gbDelOk: 'ลบข้อความแล้ว',
       tWelcome: 'ยินดีต้อนรับ คลิกรายการเพื่อแก้ไข',
@@ -176,7 +182,7 @@
   };
 
   var $ = function (id) { return document.getElementById(id); };
-  var state = { data: null, isAdmin: false, editContacts: [], editAvatar: null, qrCurrent: null, lang: 'zh', source: 'default', pass: null, visits: null, messages: [], myMsgs: [], gbEdit: null, gbEditLang: 'zh' };
+  var state = { data: null, isAdmin: false, editContacts: [], editAvatar: null, qrCurrent: null, lang: 'zh', source: 'default', pass: null, visits: null, messages: [], myMsgs: [], gbEdit: null, annEdit: null, gbEditLang: 'zh' };
 
   function applyLang() {
     document.documentElement.lang = LANG_HTML[state.lang] || 'zh-CN';
@@ -197,6 +203,7 @@
     renderVisits();
     renderMessages();
     applyGuestbookTexts();
+    applyAnnounce();
   }
 
   function renderVisits() {
@@ -335,6 +342,32 @@
     var g = all && all[state.lang] ? all[state.lang] : null;
     return (g && g[key]) || t(key === 'title' ? 'gbTitle' : key === 'namePh' ? 'gbNamePh' : key === 'textPh' ? 'gbTextPh' : key === 'submit' ? 'gbSubmit' : 'gbNote');
   }
+  function normalizeAnn(a) {
+    var s = function (v) { return typeof v === 'string' ? v.slice(0, 200) : ''; };
+    if (a && typeof a === 'string') return { zh: s(a), en: '', th: '' };
+    a = a && typeof a === 'object' ? a : {};
+    return { zh: s(a.zh), en: s(a.en), th: s(a.th) };
+  }
+  function applyAnnounce() {
+    var wrap = $('announceWrap');
+    if (!wrap) return;
+    var a = state.data && state.data.ann ? state.data.ann : null;
+    var text = a && a[state.lang] ? a[state.lang] : '';
+    if (text) {
+      $('announceText').textContent = text;
+      wrap.hidden = false;
+    } else {
+      wrap.hidden = true;
+    }
+  }
+  function harvestAnnEdit() {
+    if (!state.annEdit) state.annEdit = {};
+    state.annEdit[state.gbEditLang] = ($('fAnn').value || '').trim().slice(0, 200);
+  }
+  function fillAnnEdit() {
+    var v = (state.annEdit && state.annEdit[state.gbEditLang]) || '';
+    $('fAnn').value = v;
+  }
   /* 后台分语言编辑留言板文案 */
   function harvestGbEdit() {
     if (!state.gbEdit) state.gbEdit = {};
@@ -378,6 +411,7 @@
       tags: Array.isArray(d.tags) ? d.tags.map(String).filter(Boolean).slice(0, 8) : DEF.tags.slice(),
       avatar: typeof d.avatar === 'string' ? d.avatar : null,
       gb: normalizeGb(d.gb),
+      ann: normalizeAnn(d.ann),
       contacts: []
     };
     (Array.isArray(d.contacts) ? d.contacts : DEF.contacts).forEach(function (c) {
@@ -563,7 +597,9 @@
     $('fOrg').value = d.org;
     $('fTags').value = d.tags.join(', ');
     state.gbEdit = d.gb || { zh: {}, en: {}, th: {} };
+    state.annEdit = d.ann || { zh: '', en: '', th: '' };
     fillGbEdit();
+    fillAnnEdit();
     state.editAvatar = d.avatar || null;
     updateAvatarEdit();
     state.editContacts = d.contacts.map(function (c) {
@@ -806,8 +842,10 @@
     document.querySelectorAll('.gb-lang').forEach(function (b) {
       b.addEventListener('click', function () {
         harvestGbEdit();
+        harvestAnnEdit();
         state.gbEditLang = b.getAttribute('data-lang');
         fillGbEdit();
+        fillAnnEdit();
       });
     });
 
@@ -820,7 +858,10 @@
       d.avatar = state.editAvatar;
       harvestGbEdit();
       d.gb = state.gbEdit;
+      harvestAnnEdit();
+      d.ann = state.annEdit;
       applyGuestbookTexts();
+      applyAnnounce();
       d.contacts = state.editContacts.filter(function (c) { return c.value.trim() !== ''; })
         .map(function (c) { return { type: c.type, label: c.label || typeName(c.type), value: c.value.trim(), qrImage: c.qrImage, hidden: !!c.hidden }; });
       if (!d.contacts.length) { toast(t('tNeedOne')); return; }

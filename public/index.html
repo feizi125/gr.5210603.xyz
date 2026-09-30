@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>追风的牧者 · 个人联系方式</title>
-<link rel="stylesheet" href="style.css?v=cf17">
+<link rel="stylesheet" href="style.css?v=cf18">
   <meta name="theme-color" content="#070a16">
 </head>
 <body>
@@ -28,6 +28,15 @@
     </button>
   </div>
 </header>
+
+<div class="announce-wrap" id="announceWrap" hidden>
+  <div class="announce">
+    <span class="announce-icon">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+    </span>
+    <div class="announce-text" id="announceText"></div>
+  </div>
+</div>
 
 <main class="stage">
 
@@ -136,13 +145,22 @@
     <div class="contact-edit-list" id="contactEditList"></div>
 
     <div class="contact-edit-head gb-admin-head">
-      <span data-i18n="gbCustomHead">留言板文案</span>
+      <span data-i18n="annHead">网站公告</span>
+      <span class="tip" data-i18n="annTip">（留空不显示）</span>
     </div>
     <div class="gb-lang-row">
       <button class="pill-btn small gb-lang on" data-lang="zh" type="button">中</button>
       <button class="pill-btn small ghost gb-lang" data-lang="en" type="button">EN</button>
       <button class="pill-btn small ghost gb-lang" data-lang="th" type="button">ไทย</button>
-      <span class="tip gb-lang-tip" data-i18n="gbLangTip">按语言分别填写，留空用该语言默认</span>
+      <span class="tip gb-lang-tip" data-i18n="gbLangTip">编辑语言：公告与留言板文案共用</span>
+    </div>
+    <div class="field">
+      <label data-i18n="annLabel">公告内容</label>
+      <textarea id="fAnn" rows="3" maxlength="200" data-i18n-ph="annPh" placeholder="要向访问者展示的内容…（支持换行）"></textarea>
+    </div>
+
+    <div class="contact-edit-head gb-admin-head">
+      <span data-i18n="gbCustomHead">留言板文案</span>
     </div>
     <div class="field">
       <label data-i18n="fGbTitle">区块标题</label>
@@ -184,7 +202,7 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script src="lib/qrcode.min.js?v=cf17"></script>
-<script src="app.js?v=cf17"></script>
+<script src="lib/qrcode.min.js?v=cf18"></script>
+<script src="app.js?v=cf18"></script>
 </body>
 </html>

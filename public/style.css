@@ -123,6 +123,31 @@ body {
 }
 .link-btn:hover { color: var(--accent-deep); }
 
+/* ---------- 网站公告 ---------- */
+.announce-wrap {
+  max-width: 1120px; margin: 0 auto; padding: 20px 28px 0;
+  animation: riseIn .5s cubic-bezier(.22, 1, .36, 1) both;
+}
+.announce {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 15px 18px; border-radius: 20px;
+  background: linear-gradient(135deg, rgba(124, 92, 255, .16), rgba(56, 189, 248, .1));
+  border: 1px solid rgba(124, 92, 255, .38);
+  box-shadow: 0 0 28px -8px rgba(124, 92, 255, .45), inset 0 0 0 1px rgba(255, 255, 255, .03);
+  backdrop-filter: blur(16px);
+}
+.announce-icon {
+  flex: none; width: 36px; height: 36px; border-radius: 12px;
+  display: grid; place-items: center;
+  background: linear-gradient(135deg, #6d3ff5, #38bdf8); color: #fff;
+  box-shadow: 0 0 16px rgba(124, 92, 255, .55);
+}
+.announce-text {
+  font-size: 14px; line-height: 1.7; color: var(--ink);
+  white-space: pre-wrap; word-break: break-word; padding-top: 1px;
+}
+@media (max-width: 900px) { .announce-wrap { padding: 16px 18px 0; } }
+
 /* ---------- 主舞台 ---------- */
 .stage {
   max-width: 1120px; margin: 0 auto; padding: 30px 28px 70px;
@@ -407,14 +432,15 @@ body {
 .field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
 .field label { font-size: 12.5px; font-weight: 600; color: var(--ink-soft); letter-spacing: .1em; }
 .field label .tip { font-weight: 400; opacity: .75; }
-.field input, .field select {
+.field input, .field select, .field textarea {
   padding: 11px 14px; border-radius: 14px;
   border: 1.5px solid rgba(255, 255, 255, .12);
   background: rgba(255, 255, 255, .05);
   font-family: var(--font); font-size: 14px; color: var(--ink);
   outline: none; transition: border-color .18s ease, box-shadow .18s ease;
 }
-.field input::placeholder { color: #5a6078; }
+.field textarea { resize: vertical; min-height: 66px; line-height: 1.6; }
+.field input::placeholder, .field textarea::placeholder { color: #5a6078; }
 .field select { appearance: none; }
 .field select option { background: #131830; color: var(--ink); }
 .field input:focus, .field select:focus {
