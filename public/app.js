@@ -353,10 +353,14 @@
   function showModal(id) { $(id).hidden = false; }
   function hideModal(id) { $(id).hidden = true; }
 
+  function adminEntry() {
+    return location.pathname === '/admin' || location.hash.indexOf('admin') >= 0;
+  }
+
   function setAdmin(on) {
     state.isAdmin = on;
     $('btnAdmin').classList.toggle('on', on);
-    $('btnAdmin').hidden = !on && location.hash.indexOf('admin') < 0;
+    $('btnAdmin').hidden = !on && !adminEntry();
     if (on) {
       if (state.pass) sessionStorage.setItem(SESSION_KEY, state.pass);
     } else {
@@ -671,7 +675,7 @@
     try { state.lang = localStorage.getItem(LANG_STORE) || 'zh'; } catch (e) { state.lang = 'zh'; }
     if (LANG_KEYS.indexOf(state.lang) < 0) state.lang = 'zh';
     bind();
-    if (location.hash.indexOf('admin') >= 0) $('btnAdmin').hidden = false;
+    if (adminEntry()) $('btnAdmin').hidden = false;
     loadData(function (d) {
       state.data = d;
       applyLang();

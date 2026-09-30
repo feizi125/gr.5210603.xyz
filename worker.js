@@ -53,6 +53,10 @@ export default {
       return jsonRes({ ok: true });
     }
 
+    if (url.pathname === '/admin') {
+      return env.ASSETS.fetch(new Request(new URL('/index.html', url), request));
+    }
+
     return env.ASSETS.fetch(request);
   }
 };
