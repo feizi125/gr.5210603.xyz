@@ -25,15 +25,16 @@ export class Guestbook extends DurableObject {
   }
   async add(name, text) {
     const list = await this.list();
-    list.unshift({
+    const msg = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       name: name,
       text: text,
       ts: Date.now()
-    });
+    };
+    list.unshift(msg);
     if (list.length > 200) list.length = 200;
     await this.ctx.storage.put('messages', list);
-    return list;
+    return msg;
   }
   async remove(id) {
     const list = (await this.list()).filter(function (m) { return !m || m.id !== id; });
@@ -74,8 +75,13 @@ export default {
       return jsonRes({ visits: next });
     }
 
-    if (url.pathname === '/api/messages' && request.method === 'GET') {
-      return jsonRes(await gb().list());
+    /* 留言列表仅管理员可读（私密留言板） */
+    if (url.pathname === '/api/messages-admin' && request.method === 'POST') {
+      const body = await request.json().catch(() => null);
+      if (!body || body.pass !== env.ADMIN_PASS) {
+        return jsonRes({ ok: false, error: 'unauthorized' }, 401);
+      }
+      return jsonRes({ ok: true, messages: await gb().list() });
     }
 
     if (url.pathname === '/api/message' && request.method === 'POST') {
@@ -83,7 +89,8 @@ export default {
       const name = String((body && body.name) || '').trim().slice(0, 20);
       const text = String((body && body.text) || '').trim().slice(0, 300);
       if (!text) return jsonRes({ ok: false, error: 'empty' }, 400);
-      return jsonRes({ ok: true, messages: await gb().add(name, text) });
+      /* 只返回该访客自己的留言，不泄露他人留言 */
+      return jsonRes({ ok: true, message: await gb().add(name, text) });
     }
 
     if (url.pathname === '/api/msg-delete' && request.method === 'POST') {

@@ -29,8 +29,9 @@
       tNeedOne: '至少保留一条联系方式', tImgBig: '图片请小于 20MB', tLogout: '已退出编辑模式',
       visitFmt: '本站已被访问 {n} 次',
       gbTitle: '留言板', gbNamePh: '昵称（可留空）', gbTextPh: '给站长留个言吧…', gbSubmit: '提交留言',
-      gbEmpty: '还没有留言，来抢第一个沙发～', gbAnonymous: '游客', gbOk: '留言成功',
-      gbNeedText: '请输入留言内容', gbManage: '留言管理', gbDel: '删除留言', gbNoMsg: '暂无留言',
+      gbEmpty: '你还没有留言，写下第一条吧（仅你和站长可见）', gbAnonymous: '游客', gbOk: '留言成功，仅你和站长可见',
+      gbNeedText: '请输入留言内容', gbManage: '留言管理（仅站长可见）', gbDel: '删除留言', gbNoMsg: '暂无留言',
+      gbNote: '留言提交后仅你自己和站长可见，其他访客无法查看',
       gbFail: '操作失败，请稍后再试', gbDelOk: '留言已删除',
       tWelcome: '欢迎回来，点击条目即可编辑',
       tQrAdded: '二维码图片已添加', tQrTooLong: '内容过长，无法生成二维码',
@@ -57,8 +58,9 @@
       tNeedOne: 'Keep at least one contact entry', tImgBig: 'Image must be under 20MB', tLogout: 'Logged out of edit mode',
       visitFmt: 'Visited {n} times',
       gbTitle: 'Guestbook', gbNamePh: 'Nickname (optional)', gbTextPh: 'Leave a message…', gbSubmit: 'Post',
-      gbEmpty: 'No messages yet. Be the first!', gbAnonymous: 'Guest', gbOk: 'Posted!',
-      gbNeedText: 'Please enter a message', gbManage: 'Manage Messages', gbDel: 'Delete', gbNoMsg: 'No messages',
+      gbEmpty: 'You have not posted yet. Your message stays private (visible only to you and the owner)', gbAnonymous: 'Guest', gbOk: 'Posted! Only you and the owner can see it',
+      gbNeedText: 'Please enter a message', gbManage: 'Manage Messages (owner only)', gbDel: 'Delete', gbNoMsg: 'No messages',
+      gbNote: 'Only you and the site owner can see your message',
       gbFail: 'Failed, please try again later', gbDelOk: 'Message deleted',
       tWelcome: 'Welcome back, click entries to edit',
       tQrAdded: 'QR image added', tQrTooLong: 'Content too long for a QR code',
@@ -85,8 +87,9 @@
       tNeedOne: 'ต้องมีข้อมูลติดต่ออย่างน้อยหนึ่งรายการ', tImgBig: 'รูปภาพต้องมีขนาดไม่เกิน 20MB', tLogout: 'ออกจากโหมดแก้ไขแล้ว',
       visitFmt: 'เข้าชมแล้ว {n} ครั้ง',
       gbTitle: 'สมุดเยี่ยม', gbNamePh: 'ชื่อเล่น (ไม่บังคับ)', gbTextPh: 'ฝากข้อความถึงเจ้าของเว็บ…', gbSubmit: 'ส่ง',
-      gbEmpty: 'ยังไม่มีข้อความ มาเป็นคนแรกกันเถอะ', gbAnonymous: 'ผู้เยี่ยมชม', gbOk: 'ส่งข้อความแล้ว',
-      gbNeedText: 'กรุณาพิมพ์ข้อความ', gbManage: 'จัดการข้อความ', gbDel: 'ลบ', gbNoMsg: 'ไม่มีข้อความ',
+      gbEmpty: 'คุณยังไม่ได้เขียนข้อความ (เฉพาะคุณและเจ้าของเว็บเท่านั้นที่เห็น)', gbAnonymous: 'ผู้เยี่ยมชม', gbOk: 'ส่งแล้ว! เฉพาะคุณและเจ้าของเว็บเท่านั้นที่เห็น',
+      gbNeedText: 'กรุณาพิมพ์ข้อความ', gbManage: 'จัดการข้อความ (เจ้าของเว็บเท่านั้น)', gbDel: 'ลบ', gbNoMsg: 'ไม่มีข้อความ',
+      gbNote: 'เฉพาะคุณและเจ้าของเว็บเท่านั้นที่เห็นข้อความนี้',
       gbFail: 'ดำเนินการไม่สำเร็จ ลองอีกครั้ง', gbDelOk: 'ลบข้อความแล้ว',
       tWelcome: 'ยินดีต้อนรับ คลิกรายการเพื่อแก้ไข',
       tQrAdded: 'เพิ่มรูปคิวอาร์แล้ว', tQrTooLong: 'เนื้อหายาวเกินไป สร้างคิวอาร์ไม่ได้',
@@ -164,7 +167,7 @@
   };
 
   var $ = function (id) { return document.getElementById(id); };
-  var state = { data: null, isAdmin: false, editContacts: [], editAvatar: null, qrCurrent: null, lang: 'zh', source: 'default', pass: null, visits: null, messages: [] };
+  var state = { data: null, isAdmin: false, editContacts: [], editAvatar: null, qrCurrent: null, lang: 'zh', source: 'default', pass: null, visits: null, messages: [], myMsgs: [] };
 
   function applyLang() {
     document.documentElement.lang = LANG_HTML[state.lang] || 'zh-CN';
@@ -183,6 +186,7 @@
     if (state.data) render();
     if (!$('editorDrawer').hidden) renderEditContacts();
     renderVisits();
+    renderMessages();
   }
 
   function renderVisits() {
@@ -201,22 +205,28 @@
     } catch (e) { return new Date(ts).toLocaleString(); }
   }
 
-  function loadMessages() {
-    fetch('/api/messages', { cache: 'no-store' })
+  /* 全部留言仅管理员可读（后台抽屉用） */
+  function loadAdminMessages() {
+    fetch('/api/messages-admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pass: state.pass })
+    })
       .then(function (r) { if (!r.ok) throw 0; return r.json(); })
-      .then(function (j) { state.messages = Array.isArray(j) ? j : []; renderMessages(); renderGbAdmin(); })
-      .catch(function () { /* 留言加载失败不影响页面 */ });
+      .then(function (j) { state.messages = Array.isArray(j.messages) ? j.messages : []; renderGbAdmin(); })
+      .catch(function () { /* 静默失败 */ });
   }
 
+  /* 公开区只显示访客自己本次会话提交的留言 */
   function renderMessages() {
     var box = $('gbList');
     if (!box) return;
     box.innerHTML = '';
-    if (!state.messages.length) {
+    if (!state.myMsgs.length) {
       box.innerHTML = '<li class="gb-empty">' + escapeHtml(t('gbEmpty')) + '</li>';
       return;
     }
-    state.messages.forEach(function (m) {
+    state.myMsgs.forEach(function (m) {
       var li = document.createElement('li');
       li.className = 'gb-item glass';
       li.innerHTML =
@@ -261,9 +271,8 @@
     })
       .then(function (r) { if (!r.ok) throw 0; return r.json(); })
       .then(function (j) {
-        state.messages = j.messages || [];
+        if (j.message) state.myMsgs.unshift(j.message);
         renderMessages();
-        renderGbAdmin();
         $('gbText').value = '';
         toast(t('gbOk'));
       })
@@ -284,7 +293,6 @@
       .then(function (j) {
         if (!j) return;
         state.messages = j.messages || [];
-        renderMessages();
         renderGbAdmin();
         toast(t('gbDelOk'));
       })
@@ -503,7 +511,7 @@
       return { type: c.type, label: c.label, value: c.value, qrImage: c.qrImage, hidden: !!c.hidden };
     });
     renderEditContacts();
-    renderGbAdmin();
+    loadAdminMessages();
     $('drawerMask').hidden = false;
     $('editorDrawer').hidden = false;
   }
@@ -806,8 +814,6 @@
       .then(function (r) { if (!r.ok) throw 0; return r.json(); })
       .then(function (j) { state.visits = j.visits || 0; renderVisits(); })
       .catch(function () { /* 计数失败不影响页面 */ });
-    loadMessages();
-    setInterval(loadMessages, 30000);
     loadData(function (d) {
       state.data = d;
       applyLang();
