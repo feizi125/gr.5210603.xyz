@@ -11,6 +11,11 @@
   var SESSION_KEY = 'lanlink-admin';
   var LANG_STORE = 'lanlink-lang';
 
+  /* 云端发布：填入 GitHub fine-grained PAT（仅本仓库 Contents 读写权限）后，
+     「保存并发布」会自动把 data.json 提交到仓库，所有访客即可看到最新资料。 */
+  var GH_REPO = 'feizi125/gr.5210603.xyz';
+  var GH_TOKEN = '';
+
   /* ---------------- 多语言（中 / EN / ไทย） ---------------- */
   var I18N = {
     zh: {
@@ -31,7 +36,9 @@
       tNeedOne: '至少保留一条联系方式', tImgBig: '图片请小于 1.5MB', tLogout: '已退出编辑模式',
       tWelcome: '欢迎回来，点击条目即可编辑',
       tQrAdded: '二维码图片已添加', tQrTooLong: '内容过长，无法生成二维码',
-      tExported: '已导出 data.json，提交到仓库即可全局生效', tDataBig: '数据过大，图片请压缩后再上传'
+      tExported: '已导出 data.json，提交到仓库即可全局生效', tDataBig: '数据过大，图片请压缩后再上传',
+      tPublishing: '正在发布到云端…', tPublished: '已发布！约 1-2 分钟后所有访客可见',
+      tPublishFail: '云端发布失败：', tNoToken: '已本机保存。配置发布令牌后可云端发布（app.js 顶部 GH_TOKEN）'
     },
     en: {
       docTitle: 'Wind Chasing Shepherd · Contact Card', langTitle: 'Switch language',
@@ -51,7 +58,9 @@
       tNeedOne: 'Keep at least one contact entry', tImgBig: 'Image must be under 1.5MB', tLogout: 'Logged out of edit mode',
       tWelcome: 'Welcome back, click entries to edit',
       tQrAdded: 'QR image added', tQrTooLong: 'Content too long for a QR code',
-      tExported: 'Exported data.json — commit it to the repo to publish', tDataBig: 'Data too large, please compress images'
+      tExported: 'Exported data.json — commit it to the repo to publish', tDataBig: 'Data too large, please compress images',
+      tPublishing: 'Publishing to the cloud…', tPublished: 'Published! All visitors will see it in 1-2 min',
+      tPublishFail: 'Cloud publish failed: ', tNoToken: 'Saved locally. Set GH_TOKEN in app.js to publish to the cloud'
     },
     th: {
       docTitle: 'ผู้เลี้ยงผู้ไล่ตามลม · ข้อมูลติดต่อ', langTitle: 'เปลี่ยนภาษา',
@@ -71,7 +80,9 @@
       tNeedOne: 'ต้องมีข้อมูลติดต่ออย่างน้อยหนึ่งรายการ', tImgBig: 'รูปภาพต้องมีขนาดไม่เกิน 1.5MB', tLogout: 'ออกจากโหมดแก้ไขแล้ว',
       tWelcome: 'ยินดีต้อนรับ คลิกรายการเพื่อแก้ไข',
       tQrAdded: 'เพิ่มรูปคิวอาร์แล้ว', tQrTooLong: 'เนื้อหายาวเกินไป สร้างคิวอาร์ไม่ได้',
-      tExported: 'ส่งออก data.json แล้ว อัปโหลดไปยัง repo เพื่อให้ทุกคนเห็น', tDataBig: 'ข้อมูลใหญ่เกินไป กรุณาบีบอัดรูปภาพ'
+      tExported: 'ส่งออก data.json แล้ว อัปโหลดไปยัง repo เพื่อให้ทุกคนเห็น', tDataBig: 'ข้อมูลใหญ่เกินไป กรุณาบีบอัดรูปภาพ',
+      tPublishing: 'กำลังเผยแพร่ไปยังคลาวด์…', tPublished: 'เผยแพร่แล้ว! ผู้เยี่ยมชมจะเห็นใน 1-2 นาที',
+      tPublishFail: 'เผยแพร่ไม่สำเร็จ: ', tNoToken: 'บันทึกในเครื่องแล้ว ตั้ง GH_TOKEN ใน app.js เพื่อเผยแพร่'
     }
   };
   var LANG_KEYS = ['zh', 'en', 'th'];
@@ -201,6 +212,40 @@
   function persist() {
     try { localStorage.setItem(STORE_KEY, JSON.stringify(state.data)); }
     catch (e) { toast(t('tDataBig')); }
+  }
+
+  /* ---------------- 云端发布（GitHub Contents API） ---------------- */
+  function b64encodeUtf8(str) {
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+  function publishCloud(done, fail) {
+    if (!GH_TOKEN) { fail(t('tNoToken')); return; }
+    var api = 'https://api.github.com/repos/' + GH_REPO + '/contents/data.json';
+    var headers = { Authorization: 'Bearer ' + GH_TOKEN, Accept: 'application/vnd.github+json' };
+    fetch(api, { headers: headers })
+      .then(function (r) {
+        if (r.status === 404) return { sha: null };
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (info) {
+        var body = {
+          message: '后台更新站点资料',
+          content: b64encodeUtf8(JSON.stringify(state.data, null, 2))
+        };
+        if (info && info.sha) body.sha = info.sha;
+        return fetch(api, {
+          method: 'PUT',
+          headers: headers,
+          body: JSON.stringify(body)
+        });
+      })
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function () { done(); })
+      .catch(function (e) { fail(e && e.message ? e.message : 'ERROR'); });
   }
 
   /* ---------------- 渲染 ---------------- */
@@ -553,7 +598,15 @@
       persist();
       render();
       closeEditor();
-      toast(t('tSaved'));
+      if (GH_TOKEN) {
+        toast(t('tPublishing'));
+        publishCloud(
+          function () { toast(t('tPublished')); },
+          function (msg) { toast(t('tPublishFail') + msg); }
+        );
+      } else {
+        toast(t('tNoToken'));
+      }
     });
 
     $('btnCancelEdit').addEventListener('click', closeEditor);
