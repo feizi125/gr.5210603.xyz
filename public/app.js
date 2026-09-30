@@ -22,7 +22,7 @@
       fTags: '个性标签', tagsTip: '（用逗号分隔）', tagsPh: '例如：远程协作, 周末咖啡, 快速回复',
       fAvatar: '头像', avatarUpload: '上传头像', avatarChange: '更换头像', avatarClear: '移除头像', tAvatarSet: '头像已更新',
       contactItems: '联系方式条目', btnAddContact: '+ 添加', cancel: '取消', savePublish: '保存并发布',
-      eLabel: '名称', eValue: '内容', eRemove: '删除条目',
+      eLabel: '名称', eValue: '内容', eRemove: '删除条目', eMoveUp: '上移', eMoveDown: '下移',
       eUploadQr: '上传二维码图（可选，如微信二维码截图）', eChangeQr: '更换二维码图', eClearQr: '移除图片', eHidden: '隐藏',
       types: { phone: '电话', email: '邮箱', wechat: '微信', qq: 'QQ', whatsapp: 'WhatsApp', telegram: 'Telegram', instagram: 'Instagram', x: 'X（推特）', linkedin: 'LinkedIn', line: 'LINE', link: '网址', github: 'GitHub', address: '地址', other: '其他' },
       tCopied: '已复制：', tCopyFail: '复制失败，请手动复制', tSaved: '已保存并发布',
@@ -51,7 +51,7 @@
       fTags: 'Tags', tagsTip: ' (comma separated)', tagsPh: 'e.g. Remote, Quick reply, Coffee lover',
       fAvatar: 'Avatar', avatarUpload: 'Upload avatar', avatarChange: 'Change avatar', avatarClear: 'Remove avatar', tAvatarSet: 'Avatar updated',
       contactItems: 'Contact Entries', btnAddContact: '+ Add', cancel: 'Cancel', savePublish: 'Save & Publish',
-      eLabel: 'Label', eValue: 'Value', eRemove: 'Delete entry',
+      eLabel: 'Label', eValue: 'Value', eRemove: 'Delete entry', eMoveUp: 'Move up', eMoveDown: 'Move down',
       eUploadQr: 'Upload QR image (optional)', eChangeQr: 'Replace QR image', eClearQr: 'Remove image', eHidden: 'Hidden',
       types: { phone: 'Phone', email: 'Email', wechat: 'WeChat', qq: 'QQ', whatsapp: 'WhatsApp', telegram: 'Telegram', instagram: 'Instagram', x: 'X (Twitter)', linkedin: 'LinkedIn', line: 'LINE', link: 'Website', github: 'GitHub', address: 'Address', other: 'Other' },
       tCopied: 'Copied: ', tCopyFail: 'Copy failed, please copy manually', tSaved: 'Saved & published',
@@ -80,7 +80,7 @@
       fTags: 'แท็ก', tagsTip: ' (คั่นด้วยจุลภาค)', tagsPh: 'เช่น ทำงานระยะไกล, ตอบเร็ว, ชอบกาแฟ',
       fAvatar: 'รูปโปรไฟล์', avatarUpload: 'อัปโหลดรูปโปรไฟล์', avatarChange: 'เปลี่ยนรูปโปรไฟล์', avatarClear: 'ลบรูปโปรไฟล์', tAvatarSet: 'อัปเดตรูปโปรไฟล์แล้ว',
       contactItems: 'รายการติดต่อ', btnAddContact: '+ เพิ่ม', cancel: 'ยกเลิก', savePublish: 'บันทึกและเผยแพร่',
-      eLabel: 'ชื่อรายการ', eValue: 'เนื้อหา', eRemove: 'ลบรายการ',
+      eLabel: 'ชื่อรายการ', eValue: 'เนื้อหา', eRemove: 'ลบรายการ', eMoveUp: 'เลื่อนขึ้น', eMoveDown: 'เลื่อนลง',
       eUploadQr: 'อัปโหลดรูปคิวอาร์ (ไม่บังคับ)', eChangeQr: 'เปลี่ยนรูปคิวอาร์', eClearQr: 'ลบรูป', eHidden: 'ซ่อน',
       types: { phone: 'โทรศัพท์', email: 'อีเมล', wechat: 'WeChat', qq: 'QQ', whatsapp: 'WhatsApp', telegram: 'Telegram', instagram: 'Instagram', x: 'X (Twitter)', linkedin: 'LinkedIn', line: 'LINE', link: 'เว็บไซต์', github: 'GitHub', address: 'ที่อยู่', other: 'อื่น ๆ' },
       tCopied: 'คัดลอกแล้ว: ', tCopyFail: 'คัดลอกไม่สำเร็จ กรุณาคัดลอกด้วยตนเอง', tSaved: 'บันทึกและเผยแพร่แล้ว',
@@ -553,8 +553,11 @@
       }).join('');
       row.innerHTML =
         '<div class="ce-row-top">' +
+        '<span class="ce-order">' + (i + 1) + '</span>' +
         '<select data-k="type">' + opts + '</select>' +
         '<div class="field"><label>' + escapeHtml(t('eLabel')) + '</label><input type="text" data-k="label" maxlength="20" value="' + escapeAttr(c.label) + '"></div>' +
+        '<button class="ce-move" data-act="up"' + (i === 0 ? ' disabled' : '') + ' title="' + escapeAttr(t('eMoveUp')) + '" type="button">↑</button>' +
+        '<button class="ce-move" data-act="down"' + (i === state.editContacts.length - 1 ? ' disabled' : '') + ' title="' + escapeAttr(t('eMoveDown')) + '" type="button">↓</button>' +
         '<button class="ce-remove" title="' + escapeAttr(t('eRemove')) + '" type="button">×</button>' +
         '</div>' +
         '<div class="field"><label>' + escapeHtml(t('eValue')) + '</label><input type="text" data-k="value" maxlength="200" value="' + escapeAttr(c.value) + '"></div>' +
@@ -574,6 +577,22 @@
       row.querySelector('[data-k="label"]').addEventListener('input', function () { c.label = this.value; });
       row.querySelector('[data-k="value"]').addEventListener('input', function () { c.value = this.value; });
       row.querySelector('[data-k="hidden"]').addEventListener('change', function () { c.hidden = this.checked; });
+      var upBtn = row.querySelector('[data-act="up"]');
+      var downBtn = row.querySelector('[data-act="down"]');
+      if (upBtn) upBtn.addEventListener('click', function () {
+        if (i === 0) return;
+        var tmp = state.editContacts[i - 1];
+        state.editContacts[i - 1] = state.editContacts[i];
+        state.editContacts[i] = tmp;
+        renderEditContacts();
+      });
+      if (downBtn) downBtn.addEventListener('click', function () {
+        if (i === state.editContacts.length - 1) return;
+        var tmp = state.editContacts[i + 1];
+        state.editContacts[i + 1] = state.editContacts[i];
+        state.editContacts[i] = tmp;
+        renderEditContacts();
+      });
       row.querySelector('.ce-remove').addEventListener('click', function () {
         state.editContacts.splice(i, 1);
         renderEditContacts();

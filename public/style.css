@@ -464,9 +464,27 @@ body {
   padding: 14px; background: rgba(255, 255, 255, .035);
   display: flex; flex-direction: column; gap: 10px;
 }
-.ce-row-top { display: flex; gap: 10px; align-items: center; }
-.ce-row-top select { flex: none; width: 108px; }
+.ce-row-top { display: flex; gap: 8px; align-items: center; }
+.ce-row-top select { flex: none; width: 104px; }
 .ce-row-top .field { flex: 1; margin: 0; }
+.ce-order {
+  flex: none; width: 24px; height: 24px; border-radius: 8px;
+  display: grid; place-items: center;
+  background: rgba(124, 92, 255, .16); color: #c9bcff;
+  font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.ce-move {
+  flex: none; width: 30px; height: 30px; border-radius: 9px; cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, .14);
+  background: rgba(255, 255, 255, .05); color: var(--ink-soft);
+  font-size: 14px; line-height: 1;
+  transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+}
+.ce-move:hover:not(:disabled) {
+  background: linear-gradient(135deg, #6d3ff5, #38bdf8);
+  color: #fff; box-shadow: 0 0 14px rgba(124, 92, 255, .5);
+}
+.ce-move:disabled { opacity: .3; cursor: default; }
 .ce-qr-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .ce-qr-line .link-btn { flex: none; }
 .ce-qr-thumb {
