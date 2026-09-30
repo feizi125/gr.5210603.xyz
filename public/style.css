@@ -113,8 +113,61 @@ body {
   align-items: start;
 }
 
-/* ---------- 页脚访客计数 ---------- */
-.site-foot {
+/* ---------- 留言板 ---------- */
+.guestbook { max-width: 1120px; margin: 0 auto; padding: 0 28px 40px; }
+.guestbook h2 { font-size: 18px; font-weight: 800; letter-spacing: .12em; margin-bottom: 14px; }
+.gb-form {
+  display: flex; flex-direction: column; gap: 12px;
+  background: var(--glass); border: 1px solid var(--glass-line);
+  border-radius: var(--radius); padding: 18px 20px;
+  backdrop-filter: blur(22px); box-shadow: var(--shadow-lg);
+}
+.gb-form input, .gb-form textarea {
+  padding: 11px 14px; border-radius: 14px;
+  border: 1.5px solid rgba(91, 61, 245, .2);
+  background: rgba(255, 255, 255, .8);
+  font-family: var(--font); font-size: 14px; color: var(--ink);
+  outline: none; resize: vertical; min-height: 44px;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+.gb-form input:focus, .gb-form textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+.gb-form .gb-submit { align-self: flex-end; }
+.gb-list { list-style: none; margin-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+.gb-empty {
+  text-align: center; color: var(--ink-soft); font-size: 13.5px;
+  padding: 26px 0; background: var(--glass); border: 1px dashed rgba(91, 61, 245, .25);
+  border-radius: var(--radius);
+}
+.gb-item { padding: 14px 18px; }
+.gb-item-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+.gb-name { font-weight: 700; font-size: 13.5px; color: var(--accent-deep); }
+.gb-time { font-size: 11.5px; color: var(--ink-soft); opacity: .8; margin-left: auto; }
+.gb-text { font-size: 14px; line-height: 1.65; white-space: pre-wrap; word-break: break-word; }
+
+.gb-admin-head { margin-top: 22px; }
+.gb-admin-list { display: flex; flex-direction: column; gap: 10px; }
+.gb-admin-empty { font-size: 13px; color: var(--ink-soft); padding: 6px 0 10px; }
+.gba-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px; background: rgba(255, 255, 255, .7);
+  border: 1px solid rgba(91, 61, 245, .15); border-radius: 14px;
+}
+.gba-main { flex: 1; min-width: 0; }
+.gba-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.gba-head b { font-size: 13px; color: var(--accent-deep); }
+.gba-head span { font-size: 11px; color: var(--ink-soft); }
+.gba-text { font-size: 13px; line-height: 1.55; color: var(--ink); word-break: break-word; }
+.gba-del {
+  flex: none; width: 28px; height: 28px; border-radius: 9px; cursor: pointer;
+  border: 1px solid rgba(229, 72, 77, .35); background: rgba(229, 72, 77, .08);
+  color: #e5484d; font-size: 15px; line-height: 1;
+}
+.gba-del:hover { background: #e5484d; color: #fff; }
+
+/* ---------- 页脚访客计数 ---------- */.site-foot {
   max-width: 1120px; margin: 0 auto; padding: 6px 28px 46px;
   display: flex; align-items: center; justify-content: center; gap: 7px;
   color: var(--ink-soft); font-size: 12px; letter-spacing: .06em; opacity: .8;

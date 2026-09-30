@@ -28,6 +28,10 @@
       tCopied: '已复制：', tCopyFail: '复制失败，请手动复制', tSaved: '已保存并发布',
       tNeedOne: '至少保留一条联系方式', tImgBig: '图片请小于 20MB', tLogout: '已退出编辑模式',
       visitFmt: '本站已被访问 {n} 次',
+      gbTitle: '留言板', gbNamePh: '昵称（可留空）', gbTextPh: '给站长留个言吧…', gbSubmit: '提交留言',
+      gbEmpty: '还没有留言，来抢第一个沙发～', gbAnonymous: '游客', gbOk: '留言成功',
+      gbNeedText: '请输入留言内容', gbManage: '留言管理', gbDel: '删除留言', gbNoMsg: '暂无留言',
+      gbFail: '操作失败，请稍后再试', gbDelOk: '留言已删除',
       tWelcome: '欢迎回来，点击条目即可编辑',
       tQrAdded: '二维码图片已添加', tQrTooLong: '内容过长，无法生成二维码',
       tExported: '已导出 data.json，提交到仓库即可全局生效', tDataBig: '数据过大，图片请压缩后再上传',
@@ -52,6 +56,10 @@
       tCopied: 'Copied: ', tCopyFail: 'Copy failed, please copy manually', tSaved: 'Saved & published',
       tNeedOne: 'Keep at least one contact entry', tImgBig: 'Image must be under 20MB', tLogout: 'Logged out of edit mode',
       visitFmt: 'Visited {n} times',
+      gbTitle: 'Guestbook', gbNamePh: 'Nickname (optional)', gbTextPh: 'Leave a message…', gbSubmit: 'Post',
+      gbEmpty: 'No messages yet. Be the first!', gbAnonymous: 'Guest', gbOk: 'Posted!',
+      gbNeedText: 'Please enter a message', gbManage: 'Manage Messages', gbDel: 'Delete', gbNoMsg: 'No messages',
+      gbFail: 'Failed, please try again later', gbDelOk: 'Message deleted',
       tWelcome: 'Welcome back, click entries to edit',
       tQrAdded: 'QR image added', tQrTooLong: 'Content too long for a QR code',
       tExported: 'Exported data.json — commit it to the repo to publish', tDataBig: 'Data too large, please compress images',
@@ -76,6 +84,10 @@
       tCopied: 'คัดลอกแล้ว: ', tCopyFail: 'คัดลอกไม่สำเร็จ กรุณาคัดลอกด้วยตนเอง', tSaved: 'บันทึกและเผยแพร่แล้ว',
       tNeedOne: 'ต้องมีข้อมูลติดต่ออย่างน้อยหนึ่งรายการ', tImgBig: 'รูปภาพต้องมีขนาดไม่เกิน 20MB', tLogout: 'ออกจากโหมดแก้ไขแล้ว',
       visitFmt: 'เข้าชมแล้ว {n} ครั้ง',
+      gbTitle: 'สมุดเยี่ยม', gbNamePh: 'ชื่อเล่น (ไม่บังคับ)', gbTextPh: 'ฝากข้อความถึงเจ้าของเว็บ…', gbSubmit: 'ส่ง',
+      gbEmpty: 'ยังไม่มีข้อความ มาเป็นคนแรกกันเถอะ', gbAnonymous: 'ผู้เยี่ยมชม', gbOk: 'ส่งข้อความแล้ว',
+      gbNeedText: 'กรุณาพิมพ์ข้อความ', gbManage: 'จัดการข้อความ', gbDel: 'ลบ', gbNoMsg: 'ไม่มีข้อความ',
+      gbFail: 'ดำเนินการไม่สำเร็จ ลองอีกครั้ง', gbDelOk: 'ลบข้อความแล้ว',
       tWelcome: 'ยินดีต้อนรับ คลิกรายการเพื่อแก้ไข',
       tQrAdded: 'เพิ่มรูปคิวอาร์แล้ว', tQrTooLong: 'เนื้อหายาวเกินไป สร้างคิวอาร์ไม่ได้',
       tExported: 'ส่งออก data.json แล้ว อัปโหลดไปยัง repo เพื่อให้ทุกคนเห็น', tDataBig: 'ข้อมูลใหญ่เกินไป กรุณาบีบอัดรูปภาพ',
@@ -152,7 +164,7 @@
   };
 
   var $ = function (id) { return document.getElementById(id); };
-  var state = { data: null, isAdmin: false, editContacts: [], editAvatar: null, qrCurrent: null, lang: 'zh', source: 'default', pass: null, visits: null };
+  var state = { data: null, isAdmin: false, editContacts: [], editAvatar: null, qrCurrent: null, lang: 'zh', source: 'default', pass: null, visits: null, messages: [] };
 
   function applyLang() {
     document.documentElement.lang = LANG_HTML[state.lang] || 'zh-CN';
@@ -178,6 +190,105 @@
     if (!el) return;
     if (state.visits === null) { el.textContent = ''; return; }
     el.textContent = t('visitFmt').replace('{n}', state.visits.toLocaleString());
+  }
+
+  /* ---------------- 留言板 ---------------- */
+  function fmtTime(ts) {
+    try {
+      return new Date(ts).toLocaleString(LANG_HTML[state.lang] || 'zh-CN', {
+        year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+      });
+    } catch (e) { return new Date(ts).toLocaleString(); }
+  }
+
+  function loadMessages() {
+    fetch('/api/messages', { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (j) { state.messages = Array.isArray(j) ? j : []; renderMessages(); renderGbAdmin(); })
+      .catch(function () { /* 留言加载失败不影响页面 */ });
+  }
+
+  function renderMessages() {
+    var box = $('gbList');
+    if (!box) return;
+    box.innerHTML = '';
+    if (!state.messages.length) {
+      box.innerHTML = '<li class="gb-empty">' + escapeHtml(t('gbEmpty')) + '</li>';
+      return;
+    }
+    state.messages.forEach(function (m) {
+      var li = document.createElement('li');
+      li.className = 'gb-item glass';
+      li.innerHTML =
+        '<div class="gb-item-head"><span class="gb-name">' + escapeHtml(m.name || t('gbAnonymous')) + '</span>' +
+        '<span class="gb-time">' + escapeHtml(fmtTime(m.ts)) + '</span></div>' +
+        '<div class="gb-text">' + escapeHtml(m.text) + '</div>';
+      box.appendChild(li);
+    });
+  }
+
+  function renderGbAdmin() {
+    var box = $('gbAdminList');
+    if (!box) return;
+    box.innerHTML = '';
+    var count = $('gbManageCount');
+    if (count) count.textContent = String(state.messages.length);
+    if (!state.messages.length) {
+      box.innerHTML = '<p class="gb-admin-empty">' + escapeHtml(t('gbNoMsg')) + '</p>';
+      return;
+    }
+    state.messages.forEach(function (m) {
+      var row = document.createElement('div');
+      row.className = 'gba-row';
+      row.innerHTML =
+        '<div class="gba-main"><div class="gba-head"><b>' + escapeHtml(m.name || t('gbAnonymous')) + '</b>' +
+        '<span>' + escapeHtml(fmtTime(m.ts)) + '</span></div>' +
+        '<div class="gba-text">' + escapeHtml(m.text) + '</div></div>' +
+        '<button class="gba-del" type="button" title="' + escapeAttr(t('gbDel')) + '">×</button>';
+      row.querySelector('.gba-del').addEventListener('click', function () { deleteMessage(m.id); });
+      box.appendChild(row);
+    });
+  }
+
+  function submitMessage() {
+    var text = $('gbText').value.trim();
+    if (!text) { toast(t('gbNeedText')); return; }
+    var name = $('gbName').value.trim();
+    fetch('/api/message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, text: text })
+    })
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (j) {
+        state.messages = j.messages || [];
+        renderMessages();
+        renderGbAdmin();
+        $('gbText').value = '';
+        toast(t('gbOk'));
+      })
+      .catch(function () { toast(t('gbFail')); });
+  }
+
+  function deleteMessage(id) {
+    fetch('/api/msg-delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pass: state.pass, id: id })
+    })
+      .then(function (r) {
+        if (r.status === 401) { setAdmin(false); closeEditor(); toast(t('gbFail')); return; }
+        if (!r.ok) throw 0;
+        return r.json();
+      })
+      .then(function (j) {
+        if (!j) return;
+        state.messages = j.messages || [];
+        renderMessages();
+        renderGbAdmin();
+        toast(t('gbDelOk'));
+      })
+      .catch(function () { toast(t('gbFail')); });
   }
 
   /* ---------------- 数据读写 ---------------- */
@@ -392,6 +503,7 @@
       return { type: c.type, label: c.label, value: c.value, qrImage: c.qrImage, hidden: !!c.hidden };
     });
     renderEditContacts();
+    renderGbAdmin();
     $('drawerMask').hidden = false;
     $('editorDrawer').hidden = false;
   }
@@ -602,6 +714,8 @@
       updateAvatarEdit();
     });
 
+    $('btnGbSubmit').addEventListener('click', submitMessage);
+
     $('btnAddContact').addEventListener('click', function () {
       state.editContacts.push({ type: 'other', label: typeName('other'), value: '', qrImage: null, hidden: false });
       renderEditContacts();
@@ -692,6 +806,7 @@
       .then(function (r) { if (!r.ok) throw 0; return r.json(); })
       .then(function (j) { state.visits = j.visits || 0; renderVisits(); })
       .catch(function () { /* 计数失败不影响页面 */ });
+    loadMessages();
     loadData(function (d) {
       state.data = d;
       applyLang();

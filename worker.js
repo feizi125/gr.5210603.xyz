@@ -1,8 +1,11 @@
 /* 追风的牧者 · 联系方式展示站 API
- * GET  /api/data   公开读取站点资料（KV: site）
- * GET  /api/visit  访客计数自增并返回总数（KV: visits）
- * POST /api/login  校验管理密码 {pass}
- * POST /api/save   保存资料 {pass, data}，密码由服务端校验
+ * GET  /api/data       公开读取站点资料（KV: site）
+ * GET  /api/visit      访客计数自增并返回总数（KV: visits）
+ * GET  /api/messages   公开读取留言列表（KV: messages）
+ * POST /api/message    访客提交留言 {name, text}
+ * POST /api/msg-delete 管理员删除留言 {pass, id}
+ * POST /api/login      校验管理密码 {pass}
+ * POST /api/save       保存资料 {pass, data}，密码由服务端校验
  * 其余请求交给静态资源（public/）
  */
 function jsonRes(obj, status) {
@@ -34,6 +37,49 @@ export default {
       const next = prev + 1;
       await env.DATA.put('visits', String(next));
       return jsonRes({ visits: next });
+    }
+
+    if (url.pathname === '/api/messages' && request.method === 'GET') {
+      const raw = await env.DATA.get('messages');
+      return new Response(raw === null ? '[]' : raw, {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Cache-Control': 'no-store'
+        }
+      });
+    }
+
+    if (url.pathname === '/api/message' && request.method === 'POST') {
+      const body = await request.json().catch(() => null);
+      const name = String((body && body.name) || '').trim().slice(0, 20);
+      const text = String((body && body.text) || '').trim().slice(0, 300);
+      if (!text) return jsonRes({ ok: false, error: 'empty' }, 400);
+      const raw = await env.DATA.get('messages');
+      let list = [];
+      try { list = raw ? JSON.parse(raw) : []; } catch (e) { list = []; }
+      if (!Array.isArray(list)) list = [];
+      list.unshift({
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        name: name,
+        text: text,
+        ts: Date.now()
+      });
+      if (list.length > 200) list = list.slice(0, 200);
+      await env.DATA.put('messages', JSON.stringify(list));
+      return jsonRes({ ok: true, messages: list });
+    }
+
+    if (url.pathname === '/api/msg-delete' && request.method === 'POST') {
+      const body = await request.json().catch(() => null);
+      if (!body || body.pass !== env.ADMIN_PASS) {
+        return jsonRes({ ok: false, error: 'unauthorized' }, 401);
+      }
+      const raw = await env.DATA.get('messages');
+      let list = [];
+      try { list = raw ? JSON.parse(raw) : []; } catch (e) { list = []; }
+      list = (Array.isArray(list) ? list : []).filter(function (m) { return !m || m.id !== body.id; });
+      await env.DATA.put('messages', JSON.stringify(list));
+      return jsonRes({ ok: true, messages: list });
     }
 
     if (url.pathname === '/api/login' && request.method === 'POST') {

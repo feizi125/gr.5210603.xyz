@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>追风的牧者 · 个人联系方式</title>
-<link rel="stylesheet" href="style.css?v=cf5">
+<link rel="stylesheet" href="style.css?v=cf6">
 </head>
 <body>
 
@@ -58,6 +58,18 @@
   </section>
 
 </main>
+
+<section class="guestbook">
+  <h2 data-i18n="gbTitle">留言板</h2>
+  <div class="gb-form glass">
+    <div class="gb-form-top">
+      <input type="text" id="gbName" maxlength="20" data-i18n-ph="gbNamePh" placeholder="昵称（可留空）">
+    </div>
+    <textarea id="gbText" maxlength="300" rows="3" data-i18n-ph="gbTextPh" placeholder="给站长留个言吧…"></textarea>
+    <button class="pill-btn gb-submit" id="btnGbSubmit" type="button" data-i18n="gbSubmit">提交留言</button>
+  </div>
+  <ul class="gb-list" id="gbList"></ul>
+</section>
 
 <footer class="site-foot">
   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -133,6 +145,12 @@
     </div>
     <div class="contact-edit-list" id="contactEditList"></div>
 
+    <div class="contact-edit-head gb-admin-head">
+      <span data-i18n="gbManage">留言管理</span>
+      <span class="tip" id="gbManageCount"></span>
+    </div>
+    <div class="gb-admin-list" id="gbAdminList"></div>
+
   </div>
 
   <div class="drawer-foot">
@@ -144,7 +162,7 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script src="lib/qrcode.min.js?v=cf5"></script>
-<script src="app.js?v=cf5"></script>
+<script src="lib/qrcode.min.js?v=cf6"></script>
+<script src="app.js?v=cf6"></script>
 </body>
 </html>
