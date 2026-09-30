@@ -679,12 +679,6 @@
     $('btnLogin').addEventListener('click', doLogin);
     $('pwdInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
 
-    $('btnVcf').addEventListener('click', function () {
-      var blob = new Blob([buildVcard()], { type: 'text/vcard;charset=utf-8' });
-      var url = URL.createObjectURL(blob);
-      download((state.data.name || 'contact') + '.vcf', url);
-      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
-    });
 
 
 
