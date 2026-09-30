@@ -231,6 +231,7 @@
         '<div class="ci-icon">' + meta.icon + '</div>' +
         '<div class="ci-main"><div class="ci-label">' + escapeHtml(c.label) + '</div>' +
         '<div class="ci-value">' + valueHtml + '</div></div>' +
+        (c.qrImage ? '<img class="ci-qr-thumb" src="' + c.qrImage + '" alt="QR" data-act="qrimg" title="' + escapeAttr(t('qrTip')) + '">' : '') +
         '<div class="ci-ops">' +
         '<button class="ci-btn" data-act="copy" title="' + escapeAttr(t('copyTip')) + '">' +
         '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>' +
@@ -241,6 +242,10 @@
         copyText(c.value);
       });
       li.querySelector('[data-act="qr"]').addEventListener('click', function () {
+        openQr(c.label, c);
+      });
+      var thumb = li.querySelector('[data-act="qrimg"]');
+      if (thumb) thumb.addEventListener('click', function () {
         openQr(c.label, c);
       });
       list.appendChild(li);

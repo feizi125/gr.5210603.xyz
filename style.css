@@ -192,6 +192,15 @@ body {
 .ci-value a { color: var(--ink); text-decoration: none; }
 .ci-value a:hover { color: var(--accent); }
 
+.ci-qr-thumb {
+  flex: none; width: 66px; height: 66px; border-radius: 14px;
+  object-fit: cover; cursor: zoom-in;
+  border: 1px solid rgba(91, 61, 245, .25);
+  box-shadow: var(--shadow-sm);
+  transition: transform .18s ease;
+}
+.ci-qr-thumb:hover { transform: scale(1.06); }
+
 .ci-ops { display: flex; gap: 8px; flex: none; }
 .ci-btn {
   width: 36px; height: 36px; border-radius: 12px;
