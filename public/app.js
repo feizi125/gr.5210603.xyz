@@ -462,7 +462,7 @@
         stage.appendChild(cv);
         state.qrCurrent = { kind: 'canvas', canvas: cv, name: title || 'vcard' };
       } catch (e) {
-        stage.innerHTML = '<p style="font-size:13px;color:#5d5580">' + escapeHtml(t('tQrTooLong')) + '</p>';
+        stage.innerHTML = '<p style="font-size:13px;color:#8b91ad">' + escapeHtml(t('tQrTooLong')) + '</p>';
       }
     }
     showModal('qrModal');
@@ -561,7 +561,7 @@
         '<div class="ce-qr-line">' +
         '<button class="link-btn" data-act="upload-qr" type="button">' + escapeHtml(c.qrImage ? t('eChangeQr') : t('eUploadQr')) + '</button>' +
         (c.qrImage ? '<img class="ce-qr-thumb" src="' + c.qrImage + '" alt="QR"><button class="link-btn" data-act="clear-qr" type="button">' + escapeHtml(t('eClearQr')) + '</button>' : '') +
-        '<label class="link-btn" style="display:inline-flex;align-items:center;gap:5px;margin-left:auto;cursor:pointer"><input type="checkbox" data-k="hidden"' + (c.hidden ? ' checked' : '') + ' style="accent-color:#5b3df5">' + escapeHtml(t('eHidden')) + '</label>' +
+        '<label class="link-btn" style="display:inline-flex;align-items:center;gap:5px;margin-left:auto;cursor:pointer"><input type="checkbox" data-k="hidden"' + (c.hidden ? ' checked' : '') + ' style="accent-color:#7c5cff">' + escapeHtml(t('eHidden')) + '</label>' +
         '</div>';
       var sel = row.querySelector('select');
       sel.addEventListener('change', function () {
