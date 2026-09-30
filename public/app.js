@@ -27,6 +27,7 @@
       types: { phone: '电话', email: '邮箱', wechat: '微信', qq: 'QQ', whatsapp: 'WhatsApp', telegram: 'Telegram', instagram: 'Instagram', x: 'X（推特）', linkedin: 'LinkedIn', line: 'LINE', link: '网址', github: 'GitHub', address: '地址', other: '其他' },
       tCopied: '已复制：', tCopyFail: '复制失败，请手动复制', tSaved: '已保存并发布',
       tNeedOne: '至少保留一条联系方式', tImgBig: '图片请小于 20MB', tLogout: '已退出编辑模式',
+      visitFmt: '本站已被访问 {n} 次',
       tWelcome: '欢迎回来，点击条目即可编辑',
       tQrAdded: '二维码图片已添加', tQrTooLong: '内容过长，无法生成二维码',
       tExported: '已导出 data.json，提交到仓库即可全局生效', tDataBig: '数据过大，图片请压缩后再上传',
@@ -50,6 +51,7 @@
       types: { phone: 'Phone', email: 'Email', wechat: 'WeChat', qq: 'QQ', whatsapp: 'WhatsApp', telegram: 'Telegram', instagram: 'Instagram', x: 'X (Twitter)', linkedin: 'LinkedIn', line: 'LINE', link: 'Website', github: 'GitHub', address: 'Address', other: 'Other' },
       tCopied: 'Copied: ', tCopyFail: 'Copy failed, please copy manually', tSaved: 'Saved & published',
       tNeedOne: 'Keep at least one contact entry', tImgBig: 'Image must be under 20MB', tLogout: 'Logged out of edit mode',
+      visitFmt: 'Visited {n} times',
       tWelcome: 'Welcome back, click entries to edit',
       tQrAdded: 'QR image added', tQrTooLong: 'Content too long for a QR code',
       tExported: 'Exported data.json — commit it to the repo to publish', tDataBig: 'Data too large, please compress images',
@@ -73,6 +75,7 @@
       types: { phone: 'โทรศัพท์', email: 'อีเมล', wechat: 'WeChat', qq: 'QQ', whatsapp: 'WhatsApp', telegram: 'Telegram', instagram: 'Instagram', x: 'X (Twitter)', linkedin: 'LinkedIn', line: 'LINE', link: 'เว็บไซต์', github: 'GitHub', address: 'ที่อยู่', other: 'อื่น ๆ' },
       tCopied: 'คัดลอกแล้ว: ', tCopyFail: 'คัดลอกไม่สำเร็จ กรุณาคัดลอกด้วยตนเอง', tSaved: 'บันทึกและเผยแพร่แล้ว',
       tNeedOne: 'ต้องมีข้อมูลติดต่ออย่างน้อยหนึ่งรายการ', tImgBig: 'รูปภาพต้องมีขนาดไม่เกิน 20MB', tLogout: 'ออกจากโหมดแก้ไขแล้ว',
+      visitFmt: 'เข้าชมแล้ว {n} ครั้ง',
       tWelcome: 'ยินดีต้อนรับ คลิกรายการเพื่อแก้ไข',
       tQrAdded: 'เพิ่มรูปคิวอาร์แล้ว', tQrTooLong: 'เนื้อหายาวเกินไป สร้างคิวอาร์ไม่ได้',
       tExported: 'ส่งออก data.json แล้ว อัปโหลดไปยัง repo เพื่อให้ทุกคนเห็น', tDataBig: 'ข้อมูลใหญ่เกินไป กรุณาบีบอัดรูปภาพ',
@@ -149,7 +152,7 @@
   };
 
   var $ = function (id) { return document.getElementById(id); };
-  var state = { data: null, isAdmin: false, editContacts: [], editAvatar: null, qrCurrent: null, lang: 'zh', source: 'default', pass: null };
+  var state = { data: null, isAdmin: false, editContacts: [], editAvatar: null, qrCurrent: null, lang: 'zh', source: 'default', pass: null, visits: null };
 
   function applyLang() {
     document.documentElement.lang = LANG_HTML[state.lang] || 'zh-CN';
@@ -167,6 +170,14 @@
     if (state.source === 'default' && state.data) state.data = normalize(null);
     if (state.data) render();
     if (!$('editorDrawer').hidden) renderEditContacts();
+    renderVisits();
+  }
+
+  function renderVisits() {
+    var el = $('visitCount');
+    if (!el) return;
+    if (state.visits === null) { el.textContent = ''; return; }
+    el.textContent = t('visitFmt').replace('{n}', state.visits.toLocaleString());
   }
 
   /* ---------------- 数据读写 ---------------- */
@@ -677,6 +688,10 @@
     if (LANG_KEYS.indexOf(state.lang) < 0) state.lang = 'zh';
     bind();
     if (adminEntry()) $('btnAdmin').hidden = false;
+    fetch('/api/visit', { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (j) { state.visits = j.visits || 0; renderVisits(); })
+      .catch(function () { /* 计数失败不影响页面 */ });
     loadData(function (d) {
       state.data = d;
       applyLang();

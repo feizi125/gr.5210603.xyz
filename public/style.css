@@ -113,6 +113,13 @@ body {
   align-items: start;
 }
 
+/* ---------- 页脚访客计数 ---------- */
+.site-foot {
+  max-width: 1120px; margin: 0 auto; padding: 6px 28px 46px;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  color: var(--ink-soft); font-size: 12px; letter-spacing: .06em; opacity: .8;
+}
+
 /* ---------- 名片 ---------- */
 .profile-card {
   position: relative; overflow: hidden;

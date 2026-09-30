@@ -1,5 +1,6 @@
 /* 追风的牧者 · 联系方式展示站 API
  * GET  /api/data   公开读取站点资料（KV: site）
+ * GET  /api/visit  访客计数自增并返回总数（KV: visits）
  * POST /api/login  校验管理密码 {pass}
  * POST /api/save   保存资料 {pass, data}，密码由服务端校验
  * 其余请求交给静态资源（public/）
@@ -26,6 +27,13 @@ export default {
           'Cache-Control': 'no-store'
         }
       });
+    }
+
+    if (url.pathname === '/api/visit' && request.method === 'GET') {
+      const prev = parseInt((await env.DATA.get('visits')) || '0', 10);
+      const next = prev + 1;
+      await env.DATA.put('visits', String(next));
+      return jsonRes({ visits: next });
     }
 
     if (url.pathname === '/api/login' && request.method === 'POST') {
