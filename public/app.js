@@ -26,7 +26,7 @@
       eUploadQr: '上传二维码图（可选，如微信二维码截图）', eChangeQr: '更换二维码图', eClearQr: '移除图片', eHidden: '隐藏',
       types: { phone: '电话', email: '邮箱', wechat: '微信', qq: 'QQ', whatsapp: 'WhatsApp', telegram: 'Telegram', instagram: 'Instagram', x: 'X（推特）', linkedin: 'LinkedIn', line: 'LINE', link: '网址', github: 'GitHub', address: '地址', other: '其他' },
       tCopied: '已复制：', tCopyFail: '复制失败，请手动复制', tSaved: '已保存并发布',
-      tNeedOne: '至少保留一条联系方式', tImgBig: '图片请小于 1.5MB', tLogout: '已退出编辑模式',
+      tNeedOne: '至少保留一条联系方式', tImgBig: '图片请小于 20MB', tLogout: '已退出编辑模式',
       tWelcome: '欢迎回来，点击条目即可编辑',
       tQrAdded: '二维码图片已添加', tQrTooLong: '内容过长，无法生成二维码',
       tExported: '已导出 data.json，提交到仓库即可全局生效', tDataBig: '数据过大，图片请压缩后再上传',
@@ -49,7 +49,7 @@
       eUploadQr: 'Upload QR image (optional)', eChangeQr: 'Replace QR image', eClearQr: 'Remove image', eHidden: 'Hidden',
       types: { phone: 'Phone', email: 'Email', wechat: 'WeChat', qq: 'QQ', whatsapp: 'WhatsApp', telegram: 'Telegram', instagram: 'Instagram', x: 'X (Twitter)', linkedin: 'LinkedIn', line: 'LINE', link: 'Website', github: 'GitHub', address: 'Address', other: 'Other' },
       tCopied: 'Copied: ', tCopyFail: 'Copy failed, please copy manually', tSaved: 'Saved & published',
-      tNeedOne: 'Keep at least one contact entry', tImgBig: 'Image must be under 1.5MB', tLogout: 'Logged out of edit mode',
+      tNeedOne: 'Keep at least one contact entry', tImgBig: 'Image must be under 20MB', tLogout: 'Logged out of edit mode',
       tWelcome: 'Welcome back, click entries to edit',
       tQrAdded: 'QR image added', tQrTooLong: 'Content too long for a QR code',
       tExported: 'Exported data.json — commit it to the repo to publish', tDataBig: 'Data too large, please compress images',
@@ -72,7 +72,7 @@
       eUploadQr: 'อัปโหลดรูปคิวอาร์ (ไม่บังคับ)', eChangeQr: 'เปลี่ยนรูปคิวอาร์', eClearQr: 'ลบรูป', eHidden: 'ซ่อน',
       types: { phone: 'โทรศัพท์', email: 'อีเมล', wechat: 'WeChat', qq: 'QQ', whatsapp: 'WhatsApp', telegram: 'Telegram', instagram: 'Instagram', x: 'X (Twitter)', linkedin: 'LinkedIn', line: 'LINE', link: 'เว็บไซต์', github: 'GitHub', address: 'ที่อยู่', other: 'อื่น ๆ' },
       tCopied: 'คัดลอกแล้ว: ', tCopyFail: 'คัดลอกไม่สำเร็จ กรุณาคัดลอกด้วยตนเอง', tSaved: 'บันทึกและเผยแพร่แล้ว',
-      tNeedOne: 'ต้องมีข้อมูลติดต่ออย่างน้อยหนึ่งรายการ', tImgBig: 'รูปภาพต้องมีขนาดไม่เกิน 1.5MB', tLogout: 'ออกจากโหมดแก้ไขแล้ว',
+      tNeedOne: 'ต้องมีข้อมูลติดต่ออย่างน้อยหนึ่งรายการ', tImgBig: 'รูปภาพต้องมีขนาดไม่เกิน 20MB', tLogout: 'ออกจากโหมดแก้ไขแล้ว',
       tWelcome: 'ยินดีต้อนรับ คลิกรายการเพื่อแก้ไข',
       tQrAdded: 'เพิ่มรูปคิวอาร์แล้ว', tQrTooLong: 'เนื้อหายาวเกินไป สร้างคิวอาร์ไม่ได้',
       tExported: 'ส่งออก data.json แล้ว อัปโหลดไปยัง repo เพื่อให้ทุกคนเห็น', tDataBig: 'ข้อมูลใหญ่เกินไป กรุณาบีบอัดรูปภาพ',
@@ -402,16 +402,17 @@
     $('btnClearAvatar').hidden = !state.editAvatar;
   }
 
-  function compressImage(dataUrl, cb) {
+  function compressImage(dataUrl, cb, maxDim, mime) {
+    mime = mime || 'image/jpeg';
     var img = new Image();
     img.onload = function () {
-      var max = 512;
+      var max = maxDim || 512;
       var scale = Math.min(1, max / Math.max(img.width, img.height));
       var cv = document.createElement('canvas');
       cv.width = Math.max(1, Math.round(img.width * scale));
       cv.height = Math.max(1, Math.round(img.height * scale));
       cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
-      cb(cv.toDataURL('image/jpeg', 0.85));
+      cb(cv.toDataURL(mime, mime === 'image/jpeg' ? 0.9 : undefined));
     };
     img.onerror = function () { cb(dataUrl); };
     img.src = dataUrl;
@@ -469,16 +470,18 @@
     });
   }
 
-  function pickImage(cb) {
+  function pickImage(cb, maxDim) {
     var input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
     input.addEventListener('change', function () {
       var f = input.files && input.files[0];
       if (!f) return;
-      if (f.size > 1.5 * 1024 * 1024) { toast(t('tImgBig')); return; }
+      if (f.size > 20 * 1024 * 1024) { toast(t('tImgBig')); return; }
       var fr = new FileReader();
-      fr.onload = function () { cb(fr.result); };
+      fr.onload = function () {
+        compressImage(fr.result, cb, maxDim || 1200, f.type === 'image/png' ? 'image/png' : 'image/jpeg');
+      };
       fr.readAsDataURL(f);
     });
     input.click();
@@ -577,13 +580,11 @@
     });
 
     $('btnUploadAvatar').addEventListener('click', function () {
-      pickImage(function (dataUrl) {
-        compressImage(dataUrl, function (small) {
-          state.editAvatar = small;
-          updateAvatarEdit();
-          toast(t('tAvatarSet'));
-        });
-      });
+      pickImage(function (small) {
+        state.editAvatar = small;
+        updateAvatarEdit();
+        toast(t('tAvatarSet'));
+      }, 512);
     });
     $('btnClearAvatar').addEventListener('click', function () {
       state.editAvatar = null;
