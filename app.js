@@ -267,6 +267,8 @@
     d.contacts.forEach(function (c) {
       if (c.hidden) return;
       if (c.type === 'phone') lines.push('TEL;TYPE=CELL:' + c.value);
+      if (c.type === 'whatsapp') lines.push('TEL;TYPE=CELL:' + c.value.replace(/[^\d+]/g, ''));
+      if (c.type === 'telegram') lines.push('X-SOCIALPROFILE;TYPE=telegram:' + c.value);
       if (c.type === 'email') lines.push('EMAIL;TYPE=INTERNET:' + c.value);
       if (c.type === 'link') lines.push('URL:' + c.value);
       if (c.type === 'address') lines.push('ADR;TYPE=WORK:;;' + c.value);
