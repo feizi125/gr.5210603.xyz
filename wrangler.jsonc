@@ -7,8 +7,11 @@
     "binding": "ASSETS",
     "run_worker_first": ["/api/*"]
   },
+  "vars": {
+    "ADMIN_PASS": "feizi521"
+  },
   "kv_namespaces": [
-    { "binding": "DATA", "id": "KV_ID_PLACEHOLDER" }
+    { "binding": "DATA", "id": "a93fe656579247cdb2f74f99a2f2cea5" }
   ],
   "routes": [
     { "pattern": "gr.5210603.xyz", "custom_domain": true }
