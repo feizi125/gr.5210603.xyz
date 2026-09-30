@@ -370,13 +370,14 @@
         '<div class="ci-ops">' +
         '<button class="ci-btn" data-act="copy" title="' + escapeAttr(t('copyTip')) + '">' +
         '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>' +
-        '<button class="ci-btn" data-act="qr" title="' + escapeAttr(t('qrTip')) + '">' +
-        '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/></svg></button>' +
+        (c.qrImage ? '<button class="ci-btn" data-act="qr" title="' + escapeAttr(t('qrTip')) + '">' +
+        '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/></svg></button>' : '') +
         '</div>';
       li.querySelector('[data-act="copy"]').addEventListener('click', function () {
         copyText(c.value);
       });
-      li.querySelector('[data-act="qr"]').addEventListener('click', function () {
+      var qrBtn = li.querySelector('[data-act="qr"]');
+      if (qrBtn) qrBtn.addEventListener('click', function () {
         openQr(c.label, c);
       });
       var thumb = li.querySelector('[data-act="qrimg"]');
