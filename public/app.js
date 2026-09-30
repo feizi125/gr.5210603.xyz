@@ -686,7 +686,7 @@
       setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
     });
 
-    $('btnShare').addEventListener('click', function () { openQr(t('myQr'), null); });
+
 
     $('btnQrSave').addEventListener('click', function () {
       var q = state.qrCurrent;
