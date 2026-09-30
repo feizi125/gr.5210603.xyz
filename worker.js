@@ -1,13 +1,47 @@
 /* 追风的牧者 · 联系方式展示站 API
  * GET  /api/data       公开读取站点资料（KV: site）
  * GET  /api/visit      访客计数自增并返回总数（KV: visits）
- * GET  /api/messages   公开读取留言列表（KV: messages）
+ * GET  /api/messages   公开读取留言列表（Durable Object，全球即时一致）
  * POST /api/message    访客提交留言 {name, text}
  * POST /api/msg-delete 管理员删除留言 {pass, id}
  * POST /api/login      校验管理密码 {pass}
  * POST /api/save       保存资料 {pass, data}，密码由服务端校验
  * 其余请求交给静态资源（public/）
  */
+import { DurableObject } from 'cloudflare:workers';
+
+/* 留言板：Durable Object 强一致性存储，写入后全球所有访客立即可见 */
+export class Guestbook extends DurableObject {
+  async list() {
+    let v = await this.ctx.storage.get('messages');
+    if (v === undefined) {
+      // 一次性迁移旧 KV 数据
+      const raw = await this.env.DATA.get('messages');
+      try { v = raw ? JSON.parse(raw) : []; } catch (e) { v = []; }
+      if (!Array.isArray(v)) v = [];
+      await this.ctx.storage.put('messages', v);
+    }
+    return Array.isArray(v) ? v : [];
+  }
+  async add(name, text) {
+    const list = await this.list();
+    list.unshift({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      name: name,
+      text: text,
+      ts: Date.now()
+    });
+    if (list.length > 200) list.length = 200;
+    await this.ctx.storage.put('messages', list);
+    return list;
+  }
+  async remove(id) {
+    const list = (await this.list()).filter(function (m) { return !m || m.id !== id; });
+    await this.ctx.storage.put('messages', list);
+    return list;
+  }
+}
+
 function jsonRes(obj, status) {
   return new Response(JSON.stringify(obj), {
     status: status || 200,
@@ -21,6 +55,7 @@ function jsonRes(obj, status) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const gb = () => env.GUESTBOOK.get(env.GUESTBOOK.idFromName('main'));
 
     if (url.pathname === '/api/data' && request.method === 'GET') {
       const raw = await env.DATA.get('site');
@@ -40,13 +75,7 @@ export default {
     }
 
     if (url.pathname === '/api/messages' && request.method === 'GET') {
-      const raw = await env.DATA.get('messages');
-      return new Response(raw === null ? '[]' : raw, {
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-          'Cache-Control': 'no-store'
-        }
-      });
+      return jsonRes(await gb().list());
     }
 
     if (url.pathname === '/api/message' && request.method === 'POST') {
@@ -54,19 +83,7 @@ export default {
       const name = String((body && body.name) || '').trim().slice(0, 20);
       const text = String((body && body.text) || '').trim().slice(0, 300);
       if (!text) return jsonRes({ ok: false, error: 'empty' }, 400);
-      const raw = await env.DATA.get('messages');
-      let list = [];
-      try { list = raw ? JSON.parse(raw) : []; } catch (e) { list = []; }
-      if (!Array.isArray(list)) list = [];
-      list.unshift({
-        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-        name: name,
-        text: text,
-        ts: Date.now()
-      });
-      if (list.length > 200) list = list.slice(0, 200);
-      await env.DATA.put('messages', JSON.stringify(list));
-      return jsonRes({ ok: true, messages: list });
+      return jsonRes({ ok: true, messages: await gb().add(name, text) });
     }
 
     if (url.pathname === '/api/msg-delete' && request.method === 'POST') {
@@ -74,12 +91,7 @@ export default {
       if (!body || body.pass !== env.ADMIN_PASS) {
         return jsonRes({ ok: false, error: 'unauthorized' }, 401);
       }
-      const raw = await env.DATA.get('messages');
-      let list = [];
-      try { list = raw ? JSON.parse(raw) : []; } catch (e) { list = []; }
-      list = (Array.isArray(list) ? list : []).filter(function (m) { return !m || m.id !== body.id; });
-      await env.DATA.put('messages', JSON.stringify(list));
-      return jsonRes({ ok: true, messages: list });
+      return jsonRes({ ok: true, messages: await gb().remove(String(body.id || '')) });
     }
 
     if (url.pathname === '/api/login' && request.method === 'POST') {

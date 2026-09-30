@@ -807,6 +807,7 @@
       .then(function (j) { state.visits = j.visits || 0; renderVisits(); })
       .catch(function () { /* 计数失败不影响页面 */ });
     loadMessages();
+    setInterval(loadMessages, 30000);
     loadData(function (d) {
       state.data = d;
       applyLang();

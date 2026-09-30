@@ -14,6 +14,14 @@
   "kv_namespaces": [
     { "binding": "DATA", "id": "a93fe656579247cdb2f74f99a2f2cea5" }
   ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "GUESTBOOK", "class_name": "Guestbook" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["Guestbook"] }
+  ],
   "routes": [
     { "pattern": "gr.5210603.xyz", "custom_domain": true }
   ],
