@@ -6,7 +6,7 @@
 (function () {
   'use strict';
 
-  var ADMIN_PASS = 'admin888';
+  var ADMIN_PASS = 'feizi521';
   var STORE_KEY = 'lanlink-data';
   var SESSION_KEY = 'lanlink-admin';
 
