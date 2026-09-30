@@ -32,6 +32,8 @@
       gbEmpty: '你还没有留言，写下第一条吧（仅你和站长可见）', gbAnonymous: '游客', gbOk: '留言成功，仅你和站长可见',
       gbNeedText: '请输入留言内容', gbManage: '留言管理（仅站长可见）', gbDel: '删除留言', gbNoMsg: '暂无留言',
       gbNote: '留言提交后仅你自己和站长可见，其他访客无法查看',
+      gbCustomHead: '留言板文案（自定义提示词，留空用默认）',
+      fGbTitle: '区块标题', fGbNamePh: '昵称框提示', fGbTextPh: '留言框提示', fGbSubmit: '按钮文字', fGbNote: '隐私提示',
       gbFail: '操作失败，请稍后再试', gbDelOk: '留言已删除',
       tWelcome: '欢迎回来，点击条目即可编辑',
       tQrAdded: '二维码图片已添加', tQrTooLong: '内容过长，无法生成二维码',
@@ -61,6 +63,8 @@
       gbEmpty: 'You have not posted yet. Your message stays private (visible only to you and the owner)', gbAnonymous: 'Guest', gbOk: 'Posted! Only you and the owner can see it',
       gbNeedText: 'Please enter a message', gbManage: 'Manage Messages (owner only)', gbDel: 'Delete', gbNoMsg: 'No messages',
       gbNote: 'Only you and the site owner can see your message',
+      gbCustomHead: 'Guestbook Texts (custom, blank = default)',
+      fGbTitle: 'Section title', fGbNamePh: 'Name hint', fGbTextPh: 'Message hint', fGbSubmit: 'Button text', fGbNote: 'Privacy note',
       gbFail: 'Failed, please try again later', gbDelOk: 'Message deleted',
       tWelcome: 'Welcome back, click entries to edit',
       tQrAdded: 'QR image added', tQrTooLong: 'Content too long for a QR code',
@@ -90,6 +94,8 @@
       gbEmpty: 'คุณยังไม่ได้เขียนข้อความ (เฉพาะคุณและเจ้าของเว็บเท่านั้นที่เห็น)', gbAnonymous: 'ผู้เยี่ยมชม', gbOk: 'ส่งแล้ว! เฉพาะคุณและเจ้าของเว็บเท่านั้นที่เห็น',
       gbNeedText: 'กรุณาพิมพ์ข้อความ', gbManage: 'จัดการข้อความ (เจ้าของเว็บเท่านั้น)', gbDel: 'ลบ', gbNoMsg: 'ไม่มีข้อความ',
       gbNote: 'เฉพาะคุณและเจ้าของเว็บเท่านั้นที่เห็นข้อความนี้',
+      gbCustomHead: 'ข้อความกระดาน (กำหนดเอง เว้นว่าง = ค่าเริ่มต้น)',
+      fGbTitle: 'ชื่อส่วน', fGbNamePh: 'คำใบ้ชื่อ', fGbTextPh: 'คำใบ้ข้อความ', fGbSubmit: 'ข้อความปุ่ม', fGbNote: 'หมายเหตุความเป็นส่วนตัว',
       gbFail: 'ดำเนินการไม่สำเร็จ ลองอีกครั้ง', gbDelOk: 'ลบข้อความแล้ว',
       tWelcome: 'ยินดีต้อนรับ คลิกรายการเพื่อแก้ไข',
       tQrAdded: 'เพิ่มรูปคิวอาร์แล้ว', tQrTooLong: 'เนื้อหายาวเกินไป สร้างคิวอาร์ไม่ได้',
@@ -187,6 +193,7 @@
     if (!$('editorDrawer').hidden) renderEditContacts();
     renderVisits();
     renderMessages();
+    applyGuestbookTexts();
   }
 
   function renderVisits() {
@@ -306,6 +313,25 @@
       .then(function (j) { state.source = 'json'; cb(normalize(j)); })
       .catch(function () { state.source = 'default'; cb(normalize(null)); });
   }
+  function normalizeGb(g) {
+    g = g && typeof g === 'object' ? g : {};
+    var s = function (v) { return typeof v === 'string' ? v.slice(0, 60) : ''; };
+    return { title: s(g.title), namePh: s(g.namePh), textPh: s(g.textPh), submit: s(g.submit), note: s(g.note) };
+  }
+  /* 自定义留言板文案优先，空则用当前语言默认 */
+  function gbText(key) {
+    var g = state.data && state.data.gb ? state.data.gb : null;
+    return (g && g[key]) || t(key === 'title' ? 'gbTitle' : key === 'namePh' ? 'gbNamePh' : key === 'textPh' ? 'gbTextPh' : key === 'submit' ? 'gbSubmit' : 'gbNote');
+  }
+  function applyGuestbookTexts() {
+    var el = $('gbTitleEl');
+    if (el) el.textContent = gbText('title');
+    var n = $('gbName'), x = $('gbText'), b = $('btnGbSubmit'), note = document.querySelector('.gb-note');
+    if (n) n.placeholder = gbText('namePh');
+    if (x) x.placeholder = gbText('textPh');
+    if (b) b.textContent = gbText('submit');
+    if (note) note.textContent = gbText('note');
+  }
   function normalize(d) {
     d = d && typeof d === 'object' ? d : {};
     var DEF = defaultsFor(state.lang);
@@ -315,6 +341,7 @@
       org: String(d.org || DEF.org),
       tags: Array.isArray(d.tags) ? d.tags.map(String).filter(Boolean).slice(0, 8) : DEF.tags.slice(),
       avatar: typeof d.avatar === 'string' ? d.avatar : null,
+      gb: normalizeGb(d.gb),
       contacts: []
     };
     (Array.isArray(d.contacts) ? d.contacts : DEF.contacts).forEach(function (c) {
@@ -499,6 +526,12 @@
     $('fTitle').value = d.title;
     $('fOrg').value = d.org;
     $('fTags').value = d.tags.join(', ');
+    var g = d.gb || {};
+    $('fGbTitle').value = g.title || '';
+    $('fGbNamePh').value = g.namePh || '';
+    $('fGbTextPh').value = g.textPh || '';
+    $('fGbSubmit').value = g.submit || '';
+    $('fGbNote').value = g.note || '';
     state.editAvatar = d.avatar || null;
     updateAvatarEdit();
     state.editContacts = d.contacts.map(function (c) {
@@ -745,6 +778,14 @@
       d.org = ($('fOrg').value || '').trim();
       d.tags = $('fTags').value.split(/[,，、]/).map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 8);
       d.avatar = state.editAvatar;
+      d.gb = {
+        title: ($('fGbTitle').value || '').trim(),
+        namePh: ($('fGbNamePh').value || '').trim(),
+        textPh: ($('fGbTextPh').value || '').trim(),
+        submit: ($('fGbSubmit').value || '').trim(),
+        note: ($('fGbNote').value || '').trim()
+      };
+      applyGuestbookTexts();
       d.contacts = state.editContacts.filter(function (c) { return c.value.trim() !== ''; })
         .map(function (c) { return { type: c.type, label: c.label || typeName(c.type), value: c.value.trim(), qrImage: c.qrImage, hidden: !!c.hidden }; });
       if (!d.contacts.length) { toast(t('tNeedOne')); return; }

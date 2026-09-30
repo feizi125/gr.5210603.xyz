@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>追风的牧者 · 个人联系方式</title>
-<link rel="stylesheet" href="style.css?v=cf15">
+<link rel="stylesheet" href="style.css?v=cf16">
   <meta name="theme-color" content="#070a16">
 </head>
 <body>
@@ -49,7 +49,7 @@
 </main>
 
 <section class="guestbook">
-  <h2 data-i18n="gbTitle">留言板</h2>
+  <h2 id="gbTitleEl" data-i18n="gbTitle">留言板</h2>
   <div class="gb-form glass">
     <div class="gb-form-top">
       <input type="text" id="gbName" maxlength="20" data-i18n-ph="gbNamePh" placeholder="昵称（可留空）">
@@ -136,6 +136,32 @@
     <div class="contact-edit-list" id="contactEditList"></div>
 
     <div class="contact-edit-head gb-admin-head">
+      <span data-i18n="gbCustomHead">留言板文案</span>
+    </div>
+    <div class="field">
+      <label data-i18n="fGbTitle">区块标题</label>
+      <input type="text" id="fGbTitle" maxlength="20" placeholder="留言板">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label data-i18n="fGbNamePh">昵称框提示</label>
+        <input type="text" id="fGbNamePh" maxlength="30" placeholder="昵称（可留空）">
+      </div>
+      <div class="field">
+        <label data-i18n="fGbSubmit">按钮文字</label>
+        <input type="text" id="fGbSubmit" maxlength="10" placeholder="提交留言">
+      </div>
+    </div>
+    <div class="field">
+      <label data-i18n="fGbTextPh">留言框提示</label>
+      <input type="text" id="fGbTextPh" maxlength="60" placeholder="给站长留个言吧…">
+    </div>
+    <div class="field">
+      <label data-i18n="fGbNote">隐私提示</label>
+      <input type="text" id="fGbNote" maxlength="60" placeholder="留言提交后仅你自己和站长可见，其他访客无法查看">
+    </div>
+
+    <div class="contact-edit-head gb-admin-head">
       <span data-i18n="gbManage">留言管理</span>
       <span class="tip" id="gbManageCount"></span>
     </div>
@@ -152,7 +178,7 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script src="lib/qrcode.min.js?v=cf15"></script>
-<script src="app.js?v=cf15"></script>
+<script src="lib/qrcode.min.js?v=cf16"></script>
+<script src="app.js?v=cf16"></script>
 </body>
 </html>
