@@ -133,6 +133,20 @@ body {
 }
 .profile-card > * { position: relative; z-index: 1; }
 
+.p-avatar {
+  width: 104px; height: 104px; border-radius: 50%;
+  margin: 0 auto 18px; background-size: cover; background-position: center;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 3px rgba(91, 61, 245, .35), 0 12px 28px rgba(91, 61, 245, .25);
+}
+
+.avatar-edit { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.avatar-preview {
+  width: 64px; height: 64px; border-radius: 50%; object-fit: cover; flex: none;
+  border: 2px solid rgba(91, 61, 245, .35);
+}
+.avatar-edit-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+
 .p-name { font-size: 32px; font-weight: 800; letter-spacing: .06em; }
 .p-title { margin-top: 8px; font-size: 15px; color: var(--ink-soft); letter-spacing: .08em; }
 .p-title::before, .p-title::after { content: "·"; margin: 0 8px; color: var(--accent); }

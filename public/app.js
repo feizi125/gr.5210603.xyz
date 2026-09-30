@@ -20,6 +20,7 @@
       qrSave: '下载 PNG', editTitle: '编辑资料', btnExport: '导出 data.json', btnLogout: '退出登录',
       fName: '姓名', fTitleLb: '职位 / 头衔', fOrg: '公司 / 团队',
       fTags: '个性标签', tagsTip: '（用逗号分隔）', tagsPh: '例如：远程协作, 周末咖啡, 快速回复',
+      fAvatar: '头像', avatarUpload: '上传头像', avatarChange: '更换头像', avatarClear: '移除头像', tAvatarSet: '头像已更新',
       contactItems: '联系方式条目', btnAddContact: '+ 添加', cancel: '取消', savePublish: '保存并发布',
       eLabel: '名称', eValue: '内容', eRemove: '删除条目',
       eUploadQr: '上传二维码图（可选，如微信二维码截图）', eChangeQr: '更换二维码图', eClearQr: '移除图片', eHidden: '隐藏',
@@ -42,6 +43,7 @@
       qrSave: 'Download PNG', editTitle: 'Edit Profile', btnExport: 'Export data.json', btnLogout: 'Log Out',
       fName: 'Name', fTitleLb: 'Title / Position', fOrg: 'Company / Team',
       fTags: 'Tags', tagsTip: ' (comma separated)', tagsPh: 'e.g. Remote, Quick reply, Coffee lover',
+      fAvatar: 'Avatar', avatarUpload: 'Upload avatar', avatarChange: 'Change avatar', avatarClear: 'Remove avatar', tAvatarSet: 'Avatar updated',
       contactItems: 'Contact Entries', btnAddContact: '+ Add', cancel: 'Cancel', savePublish: 'Save & Publish',
       eLabel: 'Label', eValue: 'Value', eRemove: 'Delete entry',
       eUploadQr: 'Upload QR image (optional)', eChangeQr: 'Replace QR image', eClearQr: 'Remove image', eHidden: 'Hidden',
@@ -64,6 +66,7 @@
       qrSave: 'ดาวน์โหลด PNG', editTitle: 'แก้ไขโปรไฟล์', btnExport: 'ส่งออก data.json', btnLogout: 'ออกจากระบบ',
       fName: 'ชื่อ', fTitleLb: 'ตำแหน่ง', fOrg: 'บริษัท / ทีม',
       fTags: 'แท็ก', tagsTip: ' (คั่นด้วยจุลภาค)', tagsPh: 'เช่น ทำงานระยะไกล, ตอบเร็ว, ชอบกาแฟ',
+      fAvatar: 'รูปโปรไฟล์', avatarUpload: 'อัปโหลดรูปโปรไฟล์', avatarChange: 'เปลี่ยนรูปโปรไฟล์', avatarClear: 'ลบรูปโปรไฟล์', tAvatarSet: 'อัปเดตรูปโปรไฟล์แล้ว',
       contactItems: 'รายการติดต่อ', btnAddContact: '+ เพิ่ม', cancel: 'ยกเลิก', savePublish: 'บันทึกและเผยแพร่',
       eLabel: 'ชื่อรายการ', eValue: 'เนื้อหา', eRemove: 'ลบรายการ',
       eUploadQr: 'อัปโหลดรูปคิวอาร์ (ไม่บังคับ)', eChangeQr: 'เปลี่ยนรูปคิวอาร์', eClearQr: 'ลบรูป', eHidden: 'ซ่อน',
@@ -146,7 +149,7 @@
   };
 
   var $ = function (id) { return document.getElementById(id); };
-  var state = { data: null, isAdmin: false, editContacts: [], qrCurrent: null, lang: 'zh', source: 'default', pass: null };
+  var state = { data: null, isAdmin: false, editContacts: [], editAvatar: null, qrCurrent: null, lang: 'zh', source: 'default', pass: null };
 
   function applyLang() {
     document.documentElement.lang = LANG_HTML[state.lang] || 'zh-CN';
@@ -207,6 +210,12 @@
     $('pTags').innerHTML = d.tags.map(function (t) {
       return '<span>' + escapeHtml(t) + '</span>';
     }).join('');
+    if (d.avatar) {
+      $('pAvatar').style.backgroundImage = 'url("' + d.avatar + '")';
+      $('pAvatar').hidden = false;
+    } else {
+      $('pAvatar').hidden = true;
+    }
 
     var list = $('contactList');
     list.innerHTML = '';
@@ -361,6 +370,8 @@
     $('fTitle').value = d.title;
     $('fOrg').value = d.org;
     $('fTags').value = d.tags.join(', ');
+    state.editAvatar = d.avatar || null;
+    updateAvatarEdit();
     state.editContacts = d.contacts.map(function (c) {
       return { type: c.type, label: c.label, value: c.value, qrImage: c.qrImage, hidden: !!c.hidden };
     });
@@ -371,6 +382,34 @@
   function closeEditor() {
     $('drawerMask').hidden = true;
     $('editorDrawer').hidden = true;
+  }
+
+  function updateAvatarEdit() {
+    var img = $('fAvatarPrev');
+    if (state.editAvatar) {
+      img.src = state.editAvatar;
+      img.hidden = false;
+    } else {
+      img.removeAttribute('src');
+      img.hidden = true;
+    }
+    $('btnUploadAvatar').textContent = state.editAvatar ? t('avatarChange') : t('avatarUpload');
+    $('btnClearAvatar').hidden = !state.editAvatar;
+  }
+
+  function compressImage(dataUrl, cb) {
+    var img = new Image();
+    img.onload = function () {
+      var max = 512;
+      var scale = Math.min(1, max / Math.max(img.width, img.height));
+      var cv = document.createElement('canvas');
+      cv.width = Math.max(1, Math.round(img.width * scale));
+      cv.height = Math.max(1, Math.round(img.height * scale));
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      cb(cv.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = function () { cb(dataUrl); };
+    img.src = dataUrl;
   }
 
   function renderEditContacts() {
@@ -532,6 +571,20 @@
       applyLang();
     });
 
+    $('btnUploadAvatar').addEventListener('click', function () {
+      pickImage(function (dataUrl) {
+        compressImage(dataUrl, function (small) {
+          state.editAvatar = small;
+          updateAvatarEdit();
+          toast(t('tAvatarSet'));
+        });
+      });
+    });
+    $('btnClearAvatar').addEventListener('click', function () {
+      state.editAvatar = null;
+      updateAvatarEdit();
+    });
+
     $('btnAddContact').addEventListener('click', function () {
       state.editContacts.push({ type: 'other', label: typeName('other'), value: '', qrImage: null, hidden: false });
       renderEditContacts();
@@ -546,7 +599,7 @@
       d.title = ($('fTitle').value || '').trim();
       d.org = ($('fOrg').value || '').trim();
       d.tags = $('fTags').value.split(/[,，、]/).map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 8);
-      d.avatar = null;
+      d.avatar = state.editAvatar;
       d.contacts = state.editContacts.filter(function (c) { return c.value.trim() !== ''; })
         .map(function (c) { return { type: c.type, label: c.label || typeName(c.type), value: c.value.trim(), qrImage: c.qrImage, hidden: !!c.hidden }; });
       if (!d.contacts.length) { toast(t('tNeedOne')); return; }
