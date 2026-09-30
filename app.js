@@ -19,6 +19,7 @@
       qrHint: '扫码添加联系人', countFmt: '联系方式 · {n} 条',
       loginTitle: '管理员登录', pwdLabel: '访问密码', pwdPh: '请输入管理密码',
       pwdErr: '密码不正确，请重试', btnLogin: '进入编辑模式',
+      myQr: '我的二维码', copyTip: '复制', qrTip: '二维码', tUnnamed: '未命名',
       qrSave: '下载 PNG', editTitle: '编辑资料', btnExport: '导出 data.json', btnLogout: '退出登录',
       uploadAvatar: '上传头像', removeAvatar: '移除头像',
       fName: '姓名', fTitleLb: '职位 / 头衔', fOrg: '公司 / 团队',
@@ -39,6 +40,7 @@
       qrHint: 'Scan to add contact', countFmt: 'Contacts · {n}',
       loginTitle: 'Admin Login', pwdLabel: 'Password', pwdPh: 'Enter admin password',
       pwdErr: 'Incorrect password, try again', btnLogin: 'Enter Edit Mode',
+      myQr: 'My QR Code', copyTip: 'Copy', qrTip: 'QR Code', tUnnamed: 'Unnamed',
       qrSave: 'Download PNG', editTitle: 'Edit Profile', btnExport: 'Export data.json', btnLogout: 'Log Out',
       uploadAvatar: 'Upload Avatar', removeAvatar: 'Remove',
       fName: 'Name', fTitleLb: 'Title / Position', fOrg: 'Company / Team',
@@ -59,6 +61,7 @@
       qrHint: 'สแกนเพื่อเพิ่มผู้ติดต่อ', countFmt: 'ผู้ติดต่อ · {n} รายการ',
       loginTitle: 'เข้าสู่ระบบผู้ดูแล', pwdLabel: 'รหัสผ่าน', pwdPh: 'กรอกรหัสผ่านผู้ดูแล',
       pwdErr: 'รหัสผ่านไม่ถูกต้อง กรุณาลองอีกครั้ง', btnLogin: 'เข้าสู่โหมดแก้ไข',
+      myQr: 'คิวอาร์ของฉัน', copyTip: 'คัดลอก', qrTip: 'คิวอาร์โค้ด', tUnnamed: 'ไม่มีชื่อ',
       qrSave: 'ดาวน์โหลด PNG', editTitle: 'แก้ไขโปรไฟล์', btnExport: 'ส่งออก data.json', btnLogout: 'ออกจากระบบ',
       uploadAvatar: 'อัปโหลดรูปโปรไฟล์', removeAvatar: 'ลบรูป',
       fName: 'ชื่อ', fTitleLb: 'ตำแหน่ง', fOrg: 'บริษัท / ทีม',
@@ -89,19 +92,39 @@
     return m[type] || type;
   }
 
-  var DEFAULTS = {
-    name: '林澜',
-    title: '独立产品设计师',
-    org: 'LANLINK 工作室',
-    tags: ['远程协作', '快速回复', '周末也在线'],
-    avatar: null,
-    contacts: [
-      { type: 'phone', label: '手机', value: '138-0000-0000', qrImage: null },
-      { type: 'email', label: '邮箱', value: 'hello@lanlink.demo', qrImage: null },
-      { type: 'wechat', label: '微信', value: 'lanlink-wechat', qrImage: null },
-      { type: 'link', label: '个人主页', value: 'https://lanlink.demo', qrImage: null }
-    ]
-  };
+  function defaultsFor(lang) {
+    var demo = {
+      zh: {
+        name: '林澜', title: '独立产品设计师', org: 'LANLINK 工作室',
+        tags: ['远程协作', '快速回复', '周末也在线'],
+        labels: ['手机', '邮箱', '微信', '个人主页']
+      },
+      en: {
+        name: 'Lin Lan', title: 'Independent Product Designer', org: 'LANLINK Studio',
+        tags: ['Remote friendly', 'Quick reply', 'Online weekends'],
+        labels: ['Phone', 'Email', 'WeChat', 'Homepage']
+      },
+      th: {
+        name: 'หลิน หลาน', title: 'นักออกแบบผลิตภัณฑ์อิสระ', org: 'สตูดิโอ LANLINK',
+        tags: ['ทำงานระยะไกล', 'ตอบเร็ว', 'ออนไลน์สุดสัปดาห์'],
+        labels: ['โทรศัพท์', 'อีเมล', 'WeChat', 'เว็บไซต์ส่วนตัว']
+      }
+    }[lang] || null;
+    if (!demo) return defaultsFor('zh');
+    return {
+      name: demo.name,
+      title: demo.title,
+      org: demo.org,
+      tags: demo.tags.slice(),
+      avatar: null,
+      contacts: [
+        { type: 'phone', label: demo.labels[0], value: '138-0000-0000', qrImage: null },
+        { type: 'email', label: demo.labels[1], value: 'hello@lanlink.demo', qrImage: null },
+        { type: 'wechat', label: demo.labels[2], value: 'lanlink-wechat', qrImage: null },
+        { type: 'link', label: demo.labels[3], value: 'https://lanlink.demo', qrImage: null }
+      ]
+    };
+  }
 
   var TYPES = {
     phone:  { name: '电话', icon: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>', href: function (v) { return 'tel:' + v; } },
@@ -119,7 +142,7 @@
   );
 
   var $ = function (id) { return document.getElementById(id); };
-  var state = { data: null, isAdmin: false, editContacts: [], qrCurrent: null, lang: 'zh' };
+  var state = { data: null, isAdmin: false, editContacts: [], qrCurrent: null, lang: 'zh', source: 'default' };
 
   function applyLang() {
     document.documentElement.lang = LANG_HTML[state.lang] || 'zh-CN';
@@ -134,6 +157,7 @@
     document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
       el.setAttribute('title', t(el.getAttribute('data-i18n-title')));
     });
+    if (state.source === 'default' && state.data) state.data = normalize(null);
     if (state.data) render();
     if (!$('editorDrawer').hidden) renderEditContacts();
   }
@@ -142,23 +166,24 @@
   function loadData(cb) {
     var saved = null;
     try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) { saved = null; }
-    if (saved && saved.name) { cb(normalize(saved)); return; }
+    if (saved && saved.name) { state.source = 'local'; cb(normalize(saved)); return; }
     fetch('data.json', { cache: 'no-store' })
       .then(function (r) { if (!r.ok) throw 0; return r.json(); })
-      .then(function (j) { cb(normalize(j)); })
-      .catch(function () { cb(normalize(null)); });
+      .then(function (j) { state.source = 'json'; cb(normalize(j)); })
+      .catch(function () { state.source = 'default'; cb(normalize(null)); });
   }
   function normalize(d) {
     d = d && typeof d === 'object' ? d : {};
+    var DEF = defaultsFor(state.lang);
     var out = {
-      name: String(d.name || DEFAULTS.name),
-      title: String(d.title || DEFAULTS.title),
-      org: String(d.org || DEFAULTS.org),
-      tags: Array.isArray(d.tags) ? d.tags.map(String).filter(Boolean).slice(0, 8) : DEFAULTS.tags.slice(),
+      name: String(d.name || DEF.name),
+      title: String(d.title || DEF.title),
+      org: String(d.org || DEF.org),
+      tags: Array.isArray(d.tags) ? d.tags.map(String).filter(Boolean).slice(0, 8) : DEF.tags.slice(),
       avatar: typeof d.avatar === 'string' ? d.avatar : null,
       contacts: []
     };
-    (Array.isArray(d.contacts) ? d.contacts : DEFAULTS.contacts).forEach(function (c) {
+    (Array.isArray(d.contacts) ? d.contacts : DEF.contacts).forEach(function (c) {
       if (!c || typeof c !== 'object') return;
       var t = TYPES[c.type] ? c.type : 'other';
       if (c.value === undefined || c.value === null || String(c.value) === '') return;
@@ -209,9 +234,9 @@
         '<div class="ci-main"><div class="ci-label">' + escapeHtml(c.label) + '</div>' +
         '<div class="ci-value">' + valueHtml + '</div></div>' +
         '<div class="ci-ops">' +
-        '<button class="ci-btn" data-act="copy" title="复制">' +
+        '<button class="ci-btn" data-act="copy" title="' + escapeAttr(t('copyTip')) + '">' +
         '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>' +
-        '<button class="ci-btn" data-act="qr" title="二维码">' +
+        '<button class="ci-btn" data-act="qr" title="' + escapeAttr(t('qrTip')) + '">' +
         '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/></svg></button>' +
         '</div>';
       li.querySelector('[data-act="copy"]').addEventListener('click', function () {
@@ -286,7 +311,7 @@
   }
 
   function openQr(title, contact) {
-    $('qrTitle').textContent = title || '二维码';
+    $('qrTitle').textContent = title || t('myQr');
     var stage = $('qrStage');
     stage.innerHTML = '';
     state.qrCurrent = null;
@@ -488,8 +513,8 @@
       setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
     });
 
-    $('btnShare').addEventListener('click', function () { openQr('我的二维码', null); });
-    $('pQrCanvas').addEventListener('click', function () { openQr('我的二维码', null); });
+    $('btnShare').addEventListener('click', function () { openQr(t('myQr'), null); });
+    $('pQrCanvas').addEventListener('click', function () { openQr(t('myQr'), null); });
 
     $('btnQrSave').addEventListener('click', function () {
       var q = state.qrCurrent;
@@ -525,7 +550,7 @@
     });
 
     $('btnAddContact').addEventListener('click', function () {
-      state.editContacts.push({ type: 'other', label: '其他', value: '', qrImage: null, hidden: false });
+      state.editContacts.push({ type: 'other', label: typeName('other'), value: '', qrImage: null, hidden: false });
       renderEditContacts();
       var rows = $('contactEditList').querySelectorAll('.ce-row');
       var last = rows[rows.length - 1];
@@ -534,7 +559,7 @@
 
     $('btnSaveEdit').addEventListener('click', function () {
       var d = state.data;
-      d.name = ($('fName').value || '').trim() || '未命名';
+      d.name = ($('fName').value || '').trim() || t('tUnnamed');
       d.title = ($('fTitle').value || '').trim();
       d.org = ($('fOrg').value || '').trim();
       d.tags = $('fTags').value.split(/[,，、]/).map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 8);
