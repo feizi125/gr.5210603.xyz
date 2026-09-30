@@ -1,20 +1,12 @@
-/* 澜联 LANLINK · 个人联系方式展示站
- * 纯静态实现：登录校验 / 数据编辑在浏览器本地完成，
- * 保存写入 localStorage，「导出 data.json」后提交到仓库即可对所有人生效。
- * 管理密码在下方 ADMIN_PASS 处修改。
+/* 追风的牧者 · 个人联系方式展示站
+ * Cloudflare Workers 版：资料存在 KV，后台保存经服务端校验密码后写入，
+ * 所有访客即时看到最新内容。管理密码只保存在 Worker 密钥中（后台 secret ADMIN_PASS）。
  */
 (function () {
   'use strict';
 
-  var ADMIN_PASS = 'feizi521';
-  var STORE_KEY = 'lanlink-data';
   var SESSION_KEY = 'lanlink-admin';
   var LANG_STORE = 'lanlink-lang';
-
-  /* 云端发布：填入 GitHub fine-grained PAT（仅本仓库 Contents 读写权限）后，
-     「保存并发布」会自动把 data.json 提交到仓库，所有访客即可看到最新资料。 */
-  var GH_REPO = 'feizi125/gr.5210603.xyz';
-  var GH_TOKEN = '';
 
   /* ---------------- 多语言（中 / EN / ไทย） ---------------- */
   var I18N = {
@@ -37,8 +29,8 @@
       tWelcome: '欢迎回来，点击条目即可编辑',
       tQrAdded: '二维码图片已添加', tQrTooLong: '内容过长，无法生成二维码',
       tExported: '已导出 data.json，提交到仓库即可全局生效', tDataBig: '数据过大，图片请压缩后再上传',
-      tPublishing: '正在发布到云端…', tPublished: '已发布！约 1-2 分钟后所有访客可见',
-      tPublishFail: '云端发布失败：', tNoToken: '已本机保存。配置发布令牌后可云端发布（app.js 顶部 GH_TOKEN）'
+      tPublishing: '正在保存…', tPublished: '已保存！全站即时生效',
+      tPublishFail: '保存失败：'
     },
     en: {
       docTitle: 'Wind Chasing Shepherd · Contact Card', langTitle: 'Switch language',
@@ -59,8 +51,8 @@
       tWelcome: 'Welcome back, click entries to edit',
       tQrAdded: 'QR image added', tQrTooLong: 'Content too long for a QR code',
       tExported: 'Exported data.json — commit it to the repo to publish', tDataBig: 'Data too large, please compress images',
-      tPublishing: 'Publishing to the cloud…', tPublished: 'Published! All visitors will see it in 1-2 min',
-      tPublishFail: 'Cloud publish failed: ', tNoToken: 'Saved locally. Set GH_TOKEN in app.js to publish to the cloud'
+      tPublishing: 'Saving…', tPublished: 'Saved! Live for all visitors instantly',
+      tPublishFail: 'Save failed: '
     },
     th: {
       docTitle: 'ผู้เลี้ยงผู้ไล่ตามลม · ข้อมูลติดต่อ', langTitle: 'เปลี่ยนภาษา',
@@ -81,8 +73,8 @@
       tWelcome: 'ยินดีต้อนรับ คลิกรายการเพื่อแก้ไข',
       tQrAdded: 'เพิ่มรูปคิวอาร์แล้ว', tQrTooLong: 'เนื้อหายาวเกินไป สร้างคิวอาร์ไม่ได้',
       tExported: 'ส่งออก data.json แล้ว อัปโหลดไปยัง repo เพื่อให้ทุกคนเห็น', tDataBig: 'ข้อมูลใหญ่เกินไป กรุณาบีบอัดรูปภาพ',
-      tPublishing: 'กำลังเผยแพร่ไปยังคลาวด์…', tPublished: 'เผยแพร่แล้ว! ผู้เยี่ยมชมจะเห็นใน 1-2 นาที',
-      tPublishFail: 'เผยแพร่ไม่สำเร็จ: ', tNoToken: 'บันทึกในเครื่องแล้ว ตั้ง GH_TOKEN ใน app.js เพื่อเผยแพร่'
+      tPublishing: 'กำลังบันทึก…', tPublished: 'บันทึกแล้ว! ผู้เยี่ยมชมทุกคนเห็นทันที',
+      tPublishFail: 'บันทึกไม่สำเร็จ: '
     }
   };
   var LANG_KEYS = ['zh', 'en', 'th'];
@@ -154,7 +146,7 @@
   };
 
   var $ = function (id) { return document.getElementById(id); };
-  var state = { data: null, isAdmin: false, editContacts: [], qrCurrent: null, lang: 'zh', source: 'default' };
+  var state = { data: null, isAdmin: false, editContacts: [], qrCurrent: null, lang: 'zh', source: 'default', pass: null };
 
   function applyLang() {
     document.documentElement.lang = LANG_HTML[state.lang] || 'zh-CN';
@@ -176,10 +168,7 @@
 
   /* ---------------- 数据读写 ---------------- */
   function loadData(cb) {
-    var saved = null;
-    try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) { saved = null; }
-    if (saved && saved.name) { state.source = 'local'; cb(normalize(saved)); return; }
-    fetch('data.json', { cache: 'no-store' })
+    fetch('/api/data', { cache: 'no-store' })
       .then(function (r) { if (!r.ok) throw 0; return r.json(); })
       .then(function (j) { state.source = 'json'; cb(normalize(j)); })
       .catch(function () { state.source = 'default'; cb(normalize(null)); });
@@ -208,44 +197,6 @@
       });
     });
     return out;
-  }
-  function persist() {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(state.data)); }
-    catch (e) { toast(t('tDataBig')); }
-  }
-
-  /* ---------------- 云端发布（GitHub Contents API） ---------------- */
-  function b64encodeUtf8(str) {
-    return btoa(unescape(encodeURIComponent(str)));
-  }
-  function publishCloud(done, fail) {
-    if (!GH_TOKEN) { fail(t('tNoToken')); return; }
-    var api = 'https://api.github.com/repos/' + GH_REPO + '/contents/data.json';
-    var headers = { Authorization: 'Bearer ' + GH_TOKEN, Accept: 'application/vnd.github+json' };
-    fetch(api, { headers: headers })
-      .then(function (r) {
-        if (r.status === 404) return { sha: null };
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-      })
-      .then(function (info) {
-        var body = {
-          message: '后台更新站点资料',
-          content: b64encodeUtf8(JSON.stringify(state.data, null, 2))
-        };
-        if (info && info.sha) body.sha = info.sha;
-        return fetch(api, {
-          method: 'PUT',
-          headers: headers,
-          body: JSON.stringify(body)
-        });
-      })
-      .then(function (r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-      })
-      .then(function () { done(); })
-      .catch(function (e) { fail(e && e.message ? e.message : 'ERROR'); });
   }
 
   /* ---------------- 渲染 ---------------- */
@@ -396,8 +347,12 @@
   function setAdmin(on) {
     state.isAdmin = on;
     $('btnAdmin').classList.toggle('on', on);
-    if (on) sessionStorage.setItem(SESSION_KEY, '1');
-    else sessionStorage.removeItem(SESSION_KEY);
+    if (on) {
+      if (state.pass) sessionStorage.setItem(SESSION_KEY, state.pass);
+    } else {
+      state.pass = null;
+      sessionStorage.removeItem(SESSION_KEY);
+    }
   }
 
   function openEditor() {
@@ -595,18 +550,26 @@
       d.contacts = state.editContacts.filter(function (c) { return c.value.trim() !== ''; })
         .map(function (c) { return { type: c.type, label: c.label || typeName(c.type), value: c.value.trim(), qrImage: c.qrImage, hidden: !!c.hidden }; });
       if (!d.contacts.length) { toast(t('tNeedOne')); return; }
-      persist();
-      render();
-      closeEditor();
-      if (GH_TOKEN) {
-        toast(t('tPublishing'));
-        publishCloud(
-          function () { toast(t('tPublished')); },
-          function (msg) { toast(t('tPublishFail') + msg); }
-        );
-      } else {
-        toast(t('tNoToken'));
-      }
+      toast(t('tPublishing'));
+      fetch('/api/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pass: state.pass, data: d })
+      })
+        .then(function (r) {
+          if (r.status === 401) {
+            setAdmin(false);
+            closeEditor();
+            toast(t('tPublishFail') + '401');
+            return;
+          }
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          state.data = d;
+          render();
+          closeEditor();
+          toast(t('tPublished'));
+        })
+        .catch(function (e) { toast(t('tPublishFail') + (e && e.message ? e.message : 'ERROR')); });
     });
 
     $('btnCancelEdit').addEventListener('click', closeEditor);
@@ -629,14 +592,24 @@
 
   function doLogin() {
     var v = $('pwdInput').value;
-    if (v === ADMIN_PASS) {
-      setAdmin(true);
-      hideModal('loginModal');
-      openEditor();
-      toast(t('tWelcome'));
-    } else {
-      $('pwdErr').hidden = false;
-    }
+    if (!v) { $('pwdErr').hidden = false; return; }
+    fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pass: v })
+    })
+      .then(function (r) {
+        if (r.ok) {
+          state.pass = v;
+          setAdmin(true);
+          hideModal('loginModal');
+          openEditor();
+          toast(t('tWelcome'));
+        } else {
+          $('pwdErr').hidden = false;
+        }
+      })
+      .catch(function () { $('pwdErr').hidden = false; });
   }
 
   /* ---------------- 启动 ---------------- */
@@ -647,7 +620,8 @@
     loadData(function (d) {
       state.data = d;
       applyLang();
-      if (sessionStorage.getItem(SESSION_KEY) === '1') setAdmin(true);
+      var savedPass = sessionStorage.getItem(SESSION_KEY);
+      if (savedPass) { state.pass = savedPass; setAdmin(true); }
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
